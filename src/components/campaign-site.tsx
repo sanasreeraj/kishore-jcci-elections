@@ -9,7 +9,7 @@ import type { CandidateProfile, ElectionInfo, MemberRecord, Supporter } from "@/
 import { searchMembers } from "@/lib/search";
 import styles from "../app/page.module.css";
 
-type LanguageKey = "en" | "or" | "te";
+type LanguageKey = "en" | "hi" | "or" | "te";
 type SearchMode = "all" | "phone" | "name" | "business" | "address";
 
 type Props = {
@@ -19,123 +19,474 @@ type Props = {
   memberRecords: MemberRecord[];
 };
 
-const copy = {
+type CampaignCopy = {
+  nav: string[];
+  modeLabels: Record<SearchMode, string>;
+  heroEyebrow: string;
+  heroTitle: string;
+  heroLead: string;
+  heroBallot: string;
+  heroDate: string;
+  heroVenue: string;
+  heroTime: string;
+  directionsTitle: string;
+  primary: string;
+  secondary: string;
+  profileKicker: string;
+  profileTitle: string;
+  aboutLabel: string;
+  aboutHeading: string;
+  backgroundLabel: string;
+  backgroundHeading: string;
+  backgroundText: string;
+  expertiseLabel: string;
+  expertiseHeading: string;
+  expertiseText: string;
+  businessKicker: string;
+  businessTitle: string;
+  electionKicker: string;
+  electionTitle: string;
+  rulesLabel: string;
+  calendarLabel: string;
+  electionRules: string[];
+  timelineLabels: string[];
+  doneLabel: string;
+  upcomingLabel: string;
+  searchTitle: string;
+  searchLead: string;
+  eligibilitySearchLabel: string;
+  searchPlaceholder: string;
+  resultFound: string;
+  resultNotFound: string;
+  eligible: string;
+  notEligible: string;
+  startTyping: string;
+  searchRuns: string;
+  matchFound: string;
+  noMatch: string;
+  matchesLabel: string;
+  addressUnavailable: string;
+  phoneUnavailable: string;
+  submissionTitle: string;
+  submissionLead: string;
+  submissionCta: string;
+  close: string;
+  formName: string;
+  formBusiness: string;
+  formPhone: string;
+  formAddress: string;
+  formNotes: string;
+  sideNoteLabel: string;
+  sideNoteTitle: string;
+  sideNoteText: string;
+  supportTitle: string;
+  supportLead: string;
+  supportCount: string;
+  supportButton: string;
+  supportButtonThanks: string;
+  supportNote: string;
+  submit: string;
+  email: string;
+  contactTitle: string;
+  contactHeading: string;
+  contactPhone: string;
+  contactEmail: string;
+  contactWhatsapp: string;
+  contactWhatsappCta: string;
+};
+
+const copy: Record<LanguageKey, CampaignCopy> = {
   en: {
     nav: ["Home", "Profile", "Eligibility", "Support", "Contact"],
+    modeLabels: { all: "All", phone: "Phone", name: "Name", business: "Business", address: "Address" },
     heroEyebrow: "JCCI Election 2026-27",
     heroTitle: "Vote for Director",
     heroLead:
       "I bring veteran discipline, business understanding, and chamber leadership to the director role.",
+    heroBallot: "Ballot",
+    heroDate: "Date",
+    heroVenue: "Venue",
+    heroTime: "Time",
+    directionsTitle: "Open directions",
     primary: "Support Me",
     secondary: "Check Eligibility",
-    tertiary: "View Details",
+    profileKicker: "Who Am I",
+    profileTitle: "Why select me.",
+    aboutLabel: "About me",
+    aboutHeading: "Serving members with discipline and clarity",
+    backgroundLabel: "Background",
+    backgroundHeading: "Indian Air Force veteran",
+    backgroundText:
+      "Disciplined service background, practical leadership, and direct exposure to operational responsibility.",
+    expertiseLabel: "Business expertise",
+    expertiseHeading: "Built for chamber decisions",
+    expertiseText:
+      "Practical exposure to taxation, labour, banking and compliance matters that directly affect local businesses.",
+    businessKicker: "Business Network",
+    businessTitle: "Our Family Businesses.",
+    electionKicker: "Election Information",
+    electionTitle: "Rules & Regulations",
+    rulesLabel: "Voting rules",
+    calendarLabel: "Election calendar",
+    electionRules: [
+      "Members must choose exactly 21 Directors, not more or less, to keep the ballot valid.",
+      "Proxy Voting is not allowed.",
+      "Membership enrollment deadline was 15.03.2026 up to 5:00 PM.",
+      "Only traders who paid membership fee for 2025-2026 (Rs. 500/- per establishment) can vote.",
+      "Final voter list publication: 06.04.2026.",
+      "Candidate eligibility: any one Proprietor, Director, or Partner of a firm/company.",
+      "Voting right: any one Proprietor, Director, or Partner can cast the vote.",
+    ],
+    timelineLabels: [
+      "Nomination filing",
+      "Scrutiny & finalisation",
+      "Withdrawal deadline",
+      "Final candidate list",
+      "Voting",
+      "Counting",
+    ],
+    doneLabel: "Done",
+    upcomingLabel: "Upcoming",
     searchTitle: "Check Eligibility",
     searchLead: "Check whether you are eligible.",
+    eligibilitySearchLabel: "Search",
+    searchPlaceholder: "Enter phone, name, business, or address",
     supportTitle: "Support Signal",
     supportLead: "Show some support.",
+    resultFound: "Found in the local member list",
+    resultNotFound: "Not found in the local member list",
+    eligible: "Likely eligible based on this record",
+    notEligible: "No match found yet",
+    startTyping: "Start by typing a member detail",
+    searchRuns: "The search runs instantly on the local member dataset.",
+    matchFound: "Match found",
+    noMatch: "No match",
+    matchesLabel: "matches",
+    addressUnavailable: "Address unavailable",
+    phoneUnavailable: "Phone unavailable",
     submissionTitle: "Add Missing Member Data",
     submissionLead:
       "If your record is missing, send it instantly through WhatsApp or email using the same details below.",
     submissionCta: "Missing? Add here.",
     close: "Close",
-    contactTitle: "Contact",
-    resultFound: "Found in the local member list",
-    resultNotFound: "Not found in the local member list",
-    eligible: "Likely eligible based on this record",
-    notEligible: "No match found yet",
+    formName: "Name",
+    formBusiness: "Business",
+    formPhone: "Phone",
+    formAddress: "Address",
+    formNotes: "Notes",
+    sideNoteLabel: "Best fallback when no backend is used",
+    sideNoteTitle: "Fast, familiar, and low friction.",
+    sideNoteText:
+      "The form prepares a clean message for WhatsApp or email, so members can submit data without waiting for a login or custom server.",
     supportCount: "Support taps",
     supportButton: "I Support Kishore Kumar",
     supportButtonThanks: "Thank you for your support",
+    supportNote:
+      "This is not official voting. It is only a support signal to understand your vote of confidence.",
     submit: "Send via WhatsApp",
     email: "Send by Email",
+    contactTitle: "Contact",
+    contactHeading: "Connect with me.",
+    contactPhone: "Phone",
+    contactEmail: "Email",
+    contactWhatsapp: "WhatsApp",
+    contactWhatsappCta: "Open direct chat with Kishore",
+  },
+  hi: {
+    nav: ["होम", "प्रोफाइल", "पात्रता", "समर्थन", "संपर्क"],
+    modeLabels: { all: "सभी", phone: "फोन", name: "नाम", business: "व्यवसाय", address: "पता" },
+    heroEyebrow: "JCCI चुनाव 2026-27",
+    heroTitle: "Director के लिए वोट दें",
+    heroLead:
+      "मैं Director की भूमिका में सैन्य अनुशासन, व्यावसायिक समझ और चैंबर नेतृत्व का अनुभव लाता हूं।",
+    heroBallot: "मतपत्र",
+    heroDate: "तिथि",
+    heroVenue: "स्थान",
+    heroTime: "समय",
+    directionsTitle: "दिशाएं खोलें",
+    primary: "मेरा समर्थन करें",
+    secondary: "पात्रता जांचें",
+    profileKicker: "मैं कौन हूं",
+    profileTitle: "मुझे क्यों चुनें।",
+    aboutLabel: "मेरे बारे में",
+    aboutHeading: "अनुशासन और स्पष्टता के साथ सदस्यों की सेवा",
+    backgroundLabel: "पृष्ठभूमि",
+    backgroundHeading: "भारतीय वायु सेना के पूर्व सैनिक",
+    backgroundText: "अनुशासित सेवा पृष्ठभूमि, व्यावहारिक नेतृत्व और जिम्मेदारी का प्रत्यक्ष अनुभव।",
+    expertiseLabel: "व्यावसायिक विशेषज्ञता",
+    expertiseHeading: "चैंबर निर्णयों के लिए तैयार",
+    expertiseText:
+      "कर, श्रम, बैंकिंग और अनुपालन विषयों का व्यावहारिक अनुभव जो स्थानीय व्यवसायों को सीधे प्रभावित करता है।",
+    businessKicker: "व्यावसायिक नेटवर्क",
+    businessTitle: "हमारे पारिवारिक व्यवसाय।",
+    electionKicker: "चुनाव जानकारी",
+    electionTitle: "नियम और विनियम",
+    rulesLabel: "मतदान नियम",
+    calendarLabel: "चुनाव कैलेंडर",
+    electionRules: [
+      "मतपत्र वैध रखने के लिए सदस्यों को ठीक 21 Directors चुनने होंगे, न अधिक न कम।",
+      "Proxy Voting की अनुमति नहीं है।",
+      "सदस्यता पंजीकरण की अंतिम तिथि 15.03.2026 शाम 5:00 बजे तक थी।",
+      "केवल वे व्यापारी वोट दे सकते हैं जिन्होंने 2025-2026 की सदस्यता फीस (Rs. 500/- प्रति प्रतिष्ठान) जमा की है।",
+      "अंतिम मतदाता सूची प्रकाशन: 06.04.2026।",
+      "उम्मीदवार पात्रता: किसी फर्म/कंपनी का कोई एक Proprietor, Director या Partner।",
+      "मतदान अधिकार: किसी एक Proprietor, Director या Partner द्वारा वोट डाला जा सकता है।",
+    ],
+    timelineLabels: [
+      "नामांकन दाखिला",
+      "जांच और अंतिमकरण",
+      "नाम वापसी अंतिम समय",
+      "अंतिम उम्मीदवार सूची",
+      "मतदान",
+      "गणना",
+    ],
+    doneLabel: "पूरा",
+    upcomingLabel: "आगामी",
+    searchTitle: "पात्रता जांचें",
+    searchLead: "जांचें कि आप पात्र हैं या नहीं।",
+    eligibilitySearchLabel: "खोज",
+    searchPlaceholder: "फोन, नाम, व्यवसाय या पता दर्ज करें",
+    supportTitle: "समर्थन संकेत",
+    supportLead: "कुछ समर्थन दिखाएं।",
+    resultFound: "स्थानीय सदस्य सूची में मिला",
+    resultNotFound: "स्थानीय सदस्य सूची में नहीं मिला",
+    eligible: "इस रिकॉर्ड के आधार पर संभवतः पात्र",
+    notEligible: "अभी तक कोई मिलान नहीं मिला",
+    startTyping: "किसी सदस्य का विवरण टाइप करके शुरू करें",
+    searchRuns: "यह खोज स्थानीय सदस्य डेटा पर तुरंत चलती है।",
+    matchFound: "मिलान मिला",
+    noMatch: "कोई मिलान नहीं",
+    matchesLabel: "मिलान",
+    addressUnavailable: "पता उपलब्ध नहीं",
+    phoneUnavailable: "फोन उपलब्ध नहीं",
+    submissionTitle: "गुम सदस्य डेटा जोड़ें",
+    submissionLead:
+      "यदि आपका रिकॉर्ड गायब है, तो नीचे दिए गए विवरण के साथ WhatsApp या Email द्वारा तुरंत भेजें।",
+    submissionCta: "रिकॉर्ड गायब? यहां जोड़ें।",
+    close: "बंद करें",
+    formName: "नाम",
+    formBusiness: "व्यवसाय",
+    formPhone: "फोन",
+    formAddress: "पता",
+    formNotes: "नोट्स",
+    sideNoteLabel: "जब बैकएंड नहीं हो, तब सबसे अच्छा विकल्प",
+    sideNoteTitle: "तेज, परिचित और आसान।",
+    sideNoteText:
+      "यह फॉर्म WhatsApp या Email के लिए साफ संदेश तैयार करता है, ताकि सदस्य बिना लॉगिन या सर्वर के भी विवरण भेज सकें।",
+    supportCount: "समर्थन टैप्स",
+    supportButton: "मैं किशोर कुमार का समर्थन करता हूं",
+    supportButtonThanks: "आपके समर्थन के लिए धन्यवाद",
+    supportNote: "यह आधिकारिक मतदान नहीं है। यह केवल आपके विश्वास का समर्थन संकेत है।",
+    submit: "WhatsApp से भेजें",
+    email: "Email से भेजें",
+    contactTitle: "संपर्क",
+    contactHeading: "मुझसे जुड़ें।",
+    contactPhone: "फोन",
+    contactEmail: "ईमेल",
+    contactWhatsapp: "व्हाट्सऐप",
+    contactWhatsappCta: "किशोर से सीधे चैट खोलें",
   },
   or: {
     nav: ["ମୁଖ୍ୟ", "ପ୍ରୋଫାଇଲ୍", "ଯୋଗ୍ୟତା", "ସମର୍ଥନ", "ଯୋଗାଯୋଗ"],
+    modeLabels: { all: "ସବୁ", phone: "ଫୋନ୍", name: "ନାମ", business: "ବ୍ୟବସାୟ", address: "ଠିକଣା" },
     heroEyebrow: "JCCI ନିର୍ବାଚନ 2026-27",
     heroTitle: "Director ପାଇଁ ଭୋଟ ଦିଅନ୍ତୁ",
     heroLead:
       "ଚି. କିଶୋର କୁମାର ସେନା ଶୃଙ୍ଖଳା, ବ୍ୟବସାୟ ବୁଝାମଣା ଏବଂ ଚେମ୍ବର ନେତୃତ୍ୱକୁ ଏକାତ୍ମ କରନ୍ତି।",
+    heroBallot: "ବ୍ୟାଲଟ୍",
+    heroDate: "ତାରିଖ",
+    heroVenue: "ସ୍ଥାନ",
+    heroTime: "ସମୟ",
+    directionsTitle: "ଦିଗ ଖୋଲନ୍ତୁ",
     primary: "ମୋତେ ସମର୍ଥନ କରନ୍ତୁ",
     secondary: "ଯୋଗ୍ୟତା ଯାଞ୍ଚ",
-    tertiary: "ବିବରଣୀ ଦେଖନ୍ତୁ",
+    profileKicker: "ମୁଁ କିଏ",
+    profileTitle: "ମୋତେ କାହିଁକି ଚୟନ କରିବେ।",
+    aboutLabel: "ମୋ ବିଷୟରେ",
+    aboutHeading: "ଶୃଙ୍ଖଳା ଓ ସ୍ପଷ୍ଟତା ସହ ସଦସ୍ୟ ସେବା",
+    backgroundLabel: "ପୃଷ୍ଠଭୂମି",
+    backgroundHeading: "ଭାରତୀୟ ବାୟୁସେନା ପୂର୍ବ ସେନାନୀ",
+    backgroundText: "ଶୃଙ୍ଖଳିତ ସେବା ପୃଷ୍ଠଭୂମି, ପ୍ରାୟୋଗିକ ନେତୃତ୍ୱ ଓ ଦାୟିତ୍ୱର ସିଧା ଅନୁଭବ।",
+    expertiseLabel: "ବ୍ୟବସାୟ ଦକ୍ଷତା",
+    expertiseHeading: "ଚେମ୍ବର ନିଷ୍ପତ୍ତି ପାଇଁ ପ୍ରସ୍ତୁତ",
+    expertiseText:
+      "ଟ୍ୟାକ୍ସ, ଲେବର, ବ୍ୟାଙ୍କିଂ ଓ କମ୍ପ୍ଲାୟାନ୍ସ ବିଷୟରେ ପ୍ରାୟୋଗିକ ଅନୁଭବ ଯାହା ସ୍ଥାନୀୟ ବ୍ୟବସାୟକୁ ପ୍ରଭାବିତ କରେ।",
+    businessKicker: "ବ୍ୟବସାୟ ନେଟୱର୍କ",
+    businessTitle: "ଆମ ପରିବାରର ବ୍ୟବସାୟ।",
+    electionKicker: "ନିର୍ବାଚନ ସୂଚନା",
+    electionTitle: "ନିୟମ ଓ ବିଧିବଳୀ",
+    rulesLabel: "ଭୋଟିଂ ନିୟମ",
+    calendarLabel: "ନିର୍ବାଚନ କ୍ୟାଲେଣ୍ଡର",
+    electionRules: [
+      "ବ୍ୟାଲଟ୍ ବୈଧ ରଖିବାକୁ ସଦସ୍ୟମାନେ ଠିକ 21 ଜଣ Directors ବାଛିବେ, ଅଧିକ କିମ୍ବା କମ୍ ନୁହେଁ।",
+      "Proxy Voting ଅନୁମୋଦିତ ନୁହେଁ।",
+      "ସଦସ୍ୟତା ନମାଂକନ ଶେଷ ସମୟ 15.03.2026 ସନ୍ଧ୍ୟା 5:00 ପର୍ଯ୍ୟନ୍ତ ଥିଲା।",
+      "2025-2026 ପାଇଁ ସଦସ୍ୟତା ଫି (Rs. 500/- ପ୍ରତି ପ୍ରତିଷ୍ଠାନ) ଦେଇଥିବା ବ୍ୟବସାୟୀମାନେ ମାତ୍ର ଭୋଟ ଦେଇପାରିବେ।",
+      "ଅନ୍ତିମ ଭୋଟର ତାଲିକା ପ୍ରକାଶ: 06.04.2026।",
+      "ପ୍ରାର୍ଥୀ ଯୋଗ୍ୟତା: କମ୍ପାନୀ/ଫର୍ମର ଯେକୌଣସି ଗୋଟିଏ Proprietor, Director କିମ୍ବା Partner।",
+      "ଭୋଟିଂ ଅଧିକାର: ଯେକୌଣସି ଗୋଟିଏ Proprietor, Director କିମ୍ବା Partner ଭୋଟ ଦେଇପାରିବେ।",
+    ],
+    timelineLabels: [
+      "ନାମାଙ୍କନ ଦାଖଲ",
+      "ସ୍କ୍ରୁଟିନି ଓ ଅନ୍ତିମକରଣ",
+      "ପ୍ରତ୍ୟାହାର ଶେଷ ସମୟ",
+      "ଅନ୍ତିମ ପ୍ରାର୍ଥୀ ତାଲିକା",
+      "ଭୋଟିଂ",
+      "ଗଣନା",
+    ],
+    doneLabel: "ସମ୍ପୂର୍ଣ୍ଣ",
+    upcomingLabel: "ଆସନ୍ତା",
     searchTitle: "ଯୋଗ୍ୟତା ଯାଞ୍ଚ",
-    searchLead: "ଫୋନ୍, ନାମ, ବ୍ୟବସାୟ ନାମ କିମ୍ବା ଠିକଣାରେ ଖୋଜନ୍ତୁ।",
+    searchLead: "ଆପଣ ଯୋଗ୍ୟ କି ନାହିଁ ଯାଞ୍ଚ କରନ୍ତୁ।",
+    eligibilitySearchLabel: "ଖୋଜନ୍ତୁ",
+    searchPlaceholder: "ଫୋନ୍, ନାମ, ବ୍ୟବସାୟ କିମ୍ବା ଠିକଣା ଲେଖନ୍ତୁ",
     supportTitle: "ସମର୍ଥନ ସଙ୍କେତ",
-    supportLead:
-      "ଏହି ଡିଭାଇସରେ ଆପଣଙ୍କ ସମର୍ଥନ ସଂଗ୍ରହ କରନ୍ତୁ। ଏହା ଏକ ଅଭିଯାନ ସଙ୍କେତ, ଆଧିକାରିକ ଭୋଟ ନୁହେଁ।",
-    submissionTitle: "ଅନୁପସ୍ଥିତ ତଥ୍ୟ ଯୋଡନ୍ତୁ",
-    submissionLead:
-      "ରେକର୍ଡ ନଥିଲେ, ସେହି ସୂଚନା WhatsApp କିମ୍ବା Email ମାଧ୍ୟମରେ ପଠାନ୍ତୁ।",
-    submissionCta: "ମିସିଂ? ଏଠାରେ ଯୋଡନ୍ତୁ।",
-    close: "ବନ୍ଦ କରନ୍ତୁ",
-    contactTitle: "ଯୋଗାଯୋଗ",
+    supportLead: "କିଛି ସମର୍ଥନ ଦିଅନ୍ତୁ।",
     resultFound: "ସ୍ଥାନୀୟ ମେମ୍ବର ତାଲିକାରେ ମିଳିଲା",
     resultNotFound: "ସ୍ଥାନୀୟ ତାଲିକାରେ ମିଳିଲା ନାହିଁ",
     eligible: "ଏହି ରେକର୍ଡ ଅନୁଯାୟୀ ଯୋଗ୍ୟ",
     notEligible: "ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ମ୍ୟାଚ୍ ନାହିଁ",
-    supportCount: "ଏହି ଡିଭାଇସର ସମର୍ଥନ ସଂଖ୍ୟା",
+    startTyping: "ସଦସ୍ୟ ବିବରଣୀ ଟାଇପ୍ କରି ଆରମ୍ଭ କରନ୍ତୁ",
+    searchRuns: "ଏହି ଖୋଜ ସ୍ଥାନୀୟ ସଦସ୍ୟ ତଥ୍ୟ ଉପରେ ତୁରନ୍ତ ଚାଲେ।",
+    matchFound: "ମ୍ୟାଚ୍ ମିଳିଲା",
+    noMatch: "ମ୍ୟାଚ୍ ନାହିଁ",
+    matchesLabel: "ମ୍ୟାଚ୍",
+    addressUnavailable: "ଠିକଣା ଉପଲବ୍ଧ ନାହିଁ",
+    phoneUnavailable: "ଫୋନ୍ ଉପଲବ୍ଧ ନାହିଁ",
+    submissionTitle: "ଅନୁପସ୍ଥିତ ସଦସ୍ୟ ତଥ୍ୟ ଯୋଡନ୍ତୁ",
+    submissionLead:
+      "ଆପଣଙ୍କ ରେକର୍ଡ ନଥିଲେ, ଏହି ତଥ୍ୟକୁ WhatsApp କିମ୍ବା Email ଦ୍ୱାରା ତୁରନ୍ତ ପଠାନ୍ତୁ।",
+    submissionCta: "ରେକର୍ଡ ନାହିଁ? ଏଠାରେ ଯୋଡନ୍ତୁ।",
+    close: "ବନ୍ଦ କରନ୍ତୁ",
+    formName: "ନାମ",
+    formBusiness: "ବ୍ୟବସାୟ",
+    formPhone: "ଫୋନ୍",
+    formAddress: "ଠିକଣା",
+    formNotes: "ଟିପ୍ପଣୀ",
+    sideNoteLabel: "ବ୍ୟାକେଣ୍ଡ ନଥିଲେ ସର୍ବୋତ୍ତମ ବିକଳ୍ପ",
+    sideNoteTitle: "ଦ୍ରୁତ, ପରିଚିତ ଓ ସହଜ।",
+    sideNoteText:
+      "ଏହି ଫର୍ମ WhatsApp କିମ୍ବା Email ପାଇଁ ସୁଚିତ ବାର୍ତ୍ତା ତିଆରି କରେ, ଯାହାରେ ଲଗଇନ୍ କିମ୍ବା ସର୍ଭର ଛଡା ବି ବିବରଣୀ ପଠାଇପାରିବେ।",
+    supportCount: "ସମର୍ଥନ ଟାପ୍",
     supportButton: "ମୁଁ କିଶୋର କୁମାରଙ୍କୁ ସମର୍ଥନ କରେ",
     supportButtonThanks: "ଆପଣଙ୍କ ସମର୍ଥନ ପାଇଁ ଧନ୍ୟବାଦ",
+    supportNote: "ଏହା ଆଧିକାରିକ ଭୋଟିଂ ନୁହେଁ। ଏହା ଆପଣଙ୍କ ବିଶ୍ୱାସର ସମର୍ଥନ ସଙ୍କେତ ମାତ୍ର।",
     submit: "WhatsApp ରେ ପଠାନ୍ତୁ",
     email: "Email ରେ ପଠାନ୍ତୁ",
+    contactTitle: "ଯୋଗାଯୋଗ",
+    contactHeading: "ମୋ ସହ ସଂଯୋଗ କରନ୍ତୁ।",
+    contactPhone: "ଫୋନ୍",
+    contactEmail: "ଇମେଲ୍",
+    contactWhatsapp: "WhatsApp",
+    contactWhatsappCta: "କିଶୋରଙ୍କ ସହ ସିଧା ଚାଟ୍ ଖୋଲନ୍ତୁ",
   },
   te: {
     nav: ["హోమ్", "ప్రొఫైల్", "అర్హత", "సపోర్ట్", "కాంటాక్ట్"],
+    modeLabels: { all: "అన్నీ", phone: "ఫోన్", name: "పేరు", business: "వ్యాపారం", address: "చిరునామా" },
     heroEyebrow: "JCCI ఎన్నికలు 2026-27",
     heroTitle: "Director కి ఓటు వేయండి",
     heroLead:
       "చి. కిశోర్ కుమార్ సైనిక క్రమశిక్షణ, వ్యాపార అవగాహన, మరియు చాంబర్ నాయకత్వాన్ని తీసుకొస్తారు.",
+    heroBallot: "బ్యాలెట్",
+    heroDate: "తేదీ",
+    heroVenue: "స్థలం",
+    heroTime: "సమయం",
+    directionsTitle: "దిశలు తెరవండి",
     primary: "నన్ను సపోర్ట్ చేయండి",
     secondary: "అర్హత తనిఖీ",
-    tertiary: "వివరాలు చూడండి",
+    profileKicker: "నేను ఎవరు",
+    profileTitle: "నన్నెందుకు ఎంచుకోవాలి.",
+    aboutLabel: "నా గురించి",
+    aboutHeading: "క్రమశిక్షణతో, స్పష్టతతో సభ్యులకు సేవ",
+    backgroundLabel: "పరిచయం",
+    backgroundHeading: "భారత వాయుసేన మాజీ సిబ్బంది",
+    backgroundText: "క్రమశిక్షణ గల సేవా నేపథ్యం, ప్రాక్టికల్ నాయకత్వం, బాధ్యతలపై ప్రత్యక్ష అనుభవం.",
+    expertiseLabel: "వ్యాపార నైపుణ్యం",
+    expertiseHeading: "చాంబర్ నిర్ణయాలకు సిద్ధంగా",
+    expertiseText:
+      "పన్నులు, కార్మిక చట్టాలు, బ్యాంకింగ్ మరియు కంప్లయెన్స్ అంశాలలో ప్రాయోగిక అనుభవం స్థానిక వ్యాపారాలకు ఉపయోగపడుతుంది.",
+    businessKicker: "వ్యాపార నెట్‌వర్క్",
+    businessTitle: "మన కుటుంబ వ్యాపారాలు.",
+    electionKicker: "ఎన్నికల సమాచారం",
+    electionTitle: "నియమాలు & నిబంధనలు",
+    rulesLabel: "ఓటింగ్ నియమాలు",
+    calendarLabel: "ఎన్నికల క్యాలెండర్",
+    electionRules: [
+      "బ్యాలెట్ చెల్లుబాటు కావాలంటే సభ్యులు కచ్చితంగా 21 Directors ను మాత్రమే ఎంచుకోవాలి, ఎక్కువా తక్కువా కాదు.",
+      "Proxy Voting అనుమతించబడదు.",
+      "సభ్యత్వ నమోదు గడువు 15.03.2026 సాయంత్రం 5:00 వరకు ఉంది.",
+      "2025-2026 సభ్యత్వ రుసుము (Rs. 500/- ప్రతి సంస్థకు) చెల్లించిన వ్యాపారులు మాత్రమే ఓటు వేయగలరు.",
+      "తుది ఓటరు జాబితా ప్రచురణ: 06.04.2026.",
+      "అభ్యర్థి అర్హత: ఒక సంస్థ/కంపెనీకి చెందిన ఏకైక Proprietor, Director లేదా Partner.",
+      "ఓటు హక్కు: ఏకైక Proprietor, Director లేదా Partner ఓటు వేయగలరు.",
+    ],
+    timelineLabels: [
+      "నామినేషన్ దాఖలు",
+      "తనిఖీ & తుది నిర్ణయం",
+      "వెనక్కి తీసుకునే గడువు",
+      "తుది అభ్యర్థుల జాబితా",
+      "ఓటింగ్",
+      "కౌంటింగ్",
+    ],
+    doneLabel: "పూర్తి",
+    upcomingLabel: "రాబోయే",
     searchTitle: "అర్హత తనిఖీ",
-    searchLead: "ఫోన్, పేరు, వ్యాపారం, లేదా చిరునామా ద్వారా వెతకండి.",
+    searchLead: "మీరు అర్హులా కాదా చూసుకోండి.",
+    eligibilitySearchLabel: "వెతుకు",
+    searchPlaceholder: "ఫోన్, పేరు, వ్యాపారం లేదా చిరునామా నమోదు చేయండి",
     supportTitle: "సపోర్ట్ సిగ్నల్",
-    supportLead:
-      "ఈ పరికరంలో మీ సపోర్ట్‌ను నమోదు చేయండి. ఇది స్థానిక సంకేతం మాత్రమే, అధికారిక ఓట్ల లెక్క కాదు.",
-    submissionTitle: "మిస్సింగ్ డేటా జోడించండి",
-    submissionLead:
-      "రికార్డు లేనప్పుడు, అదే వివరాలతో WhatsApp లేదా Email ద్వారా పంపండి.",
-    submissionCta: "మిస్సింగ్? ఇక్కడ జోడించండి.",
-    close: "మూసివేయండి",
-    contactTitle: "కాంటాక్ట్",
+    supportLead: "కొంత మద్దతు చూపించండి.",
     resultFound: "స్థానిక సభ్యుల జాబితాలో దొరికింది",
     resultNotFound: "స్థానిక జాబితాలో దొరకలేదు",
     eligible: "ఈ రికార్డు ఆధారంగా అర్హత ఉంది",
     notEligible: "ఇంకా మ్యాచ్ లేదు",
-    supportCount: "ఈ పరికరంలో సపోర్ట్ ట్యాప్స్",
+    startTyping: "ఒక సభ్యుడి వివరాలు టైప్ చేసి ప్రారంభించండి",
+    searchRuns: "ఈ సెర్చ్ స్థానిక సభ్యుల డేటాపై వెంటనే పనిచేస్తుంది.",
+    matchFound: "మ్యాచ్ దొరికింది",
+    noMatch: "మ్యాచ్ లేదు",
+    matchesLabel: "మ్యాచ్‌లు",
+    addressUnavailable: "చిరునామా అందుబాటులో లేదు",
+    phoneUnavailable: "ఫోన్ అందుబాటులో లేదు",
+    submissionTitle: "లేకపోయిన సభ్యుల డేటా జోడించండి",
+    submissionLead:
+      "మీ రికార్డు లేకపోతే, దిగువ వివరాలతో WhatsApp లేదా Email ద్వారా వెంటనే పంపండి.",
+    submissionCta: "రికార్డు లేదు? ఇక్కడ జోడించండి.",
+    close: "మూసివేయండి",
+    formName: "పేరు",
+    formBusiness: "వ్యాపారం",
+    formPhone: "ఫోన్",
+    formAddress: "చిరునామా",
+    formNotes: "గమనికలు",
+    sideNoteLabel: "బ్యాక్‌ఎండ్ లేకపోతే ఉత్తమ మార్గం",
+    sideNoteTitle: "వేగంగా, సులభంగా, పరిచయంతో.",
+    sideNoteText:
+      "ఈ ఫారం WhatsApp లేదా Email కోసం స్పష్టమైన సందేశాన్ని సిద్ధం చేస్తుంది. కాబట్టి లాగిన్ లేదా సర్వర్ లేకుండా సభ్యులు వివరాలు పంపవచ్చు.",
+    supportCount: "సపోర్ట్ ట్యాప్‌లు",
     supportButton: "నేను కిశోర్ కుమార్‌కు మద్దతు ఇస్తున్నాను",
     supportButtonThanks: "మీ మద్దతుకు ధన్యవాదాలు",
+    supportNote: "ఇది అధికారిక ఓటింగ్ కాదు. ఇది మీ మద్దతును అర్థం చేసుకునే సూచిక మాత్రమే.",
     submit: "WhatsApp ద్వారా పంపండి",
     email: "Email ద్వారా పంపండి",
+    contactTitle: "సంప్రదింపు",
+    contactHeading: "నాతో కలవండి.",
+    contactPhone: "ఫోన్",
+    contactEmail: "ఇమెయిల్",
+    contactWhatsapp: "WhatsApp",
+    contactWhatsappCta: "కిశోర్‌తో నేరుగా చాట్ తెరవండి",
   },
-} satisfies Record<LanguageKey, Record<string, string | string[]>>;
+};
 
 const languageOptions: Array<{ key: LanguageKey; label: string }> = [
   { key: "en", label: "EN" },
+  { key: "hi", label: "हिन्दी" },
   { key: "or", label: "ଓଡିଆ" },
   { key: "te", label: "తెలుగు" },
 ];
 
-const modes: Array<{ key: SearchMode; label: string }> = [
-  { key: "all", label: "All" },
-  { key: "phone", label: "Phone" },
-  { key: "name", label: "Name" },
-  { key: "business", label: "Business" },
-  { key: "address", label: "Address" },
-];
+const modes: SearchMode[] = ["all", "phone", "name", "business", "address"];
 
 function normalizePhone(value: string) {
   return value.replace(/\D/g, "");
-}
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
 }
 
 function escapeRegex(value: string) {
@@ -304,15 +655,15 @@ export function CampaignSite({
             <p className={styles.heroLead}>{activeCopy.heroLead}</p>
             <div className={styles.heroStats}>
               <div>
-                <span className={styles.heroStatLabel}>Ballot</span>
+                <span className={styles.heroStatLabel}>{activeCopy.heroBallot}</span>
                 <strong className={styles.ballotNumberBig}>8</strong>
               </div>
               <div>
-                <span className={styles.heroStatLabel}>Date</span>
+                <span className={styles.heroStatLabel}>{activeCopy.heroDate}</span>
                 <strong className={styles.heroStatHighlight}>{election.date}</strong>
               </div>
               <div>
-                <span className={styles.heroStatLabel}>Venue</span>
+                <span className={styles.heroStatLabel}>{activeCopy.heroVenue}</span>
                 <strong className={styles.heroStatHighlight}>Vedika</strong>
                 <span>{venueDisplay}</span>
                 <a
@@ -321,13 +672,13 @@ export function CampaignSite({
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Open directions in Google Maps"
-                  title="Open directions"
+                  title={activeCopy.directionsTitle}
                 >
                   <BiNavigation aria-hidden="true" className={styles.directionIcon} />
                 </a>
               </div>
               <div>
-                <span className={styles.heroStatLabel}>Time</span>
+                <span className={styles.heroStatLabel}>{activeCopy.heroTime}</span>
                 <strong className={styles.heroStatHighlight}>{election.time}</strong>
               </div>
             </div>
@@ -362,23 +713,21 @@ export function CampaignSite({
 
         <section className={styles.section} id="profile">
           <div className={styles.sectionHeader}>
-            <p className={styles.sectionKicker}>Who Am I</p>
-            <h2>Why select me.</h2>
+            <p className={styles.sectionKicker}>{activeCopy.profileKicker}</p>
+            <h2>{activeCopy.profileTitle}</h2>
           </div>
 
           <div className={styles.profileGrid}>
             <article className={styles.profilePanel}>
-              <p className={styles.cardLabel}>About me</p>
-              <h3>Serving members with discipline and clarity</h3>
+              <p className={styles.cardLabel}>{activeCopy.aboutLabel}</p>
+              <h3>{activeCopy.aboutHeading}</h3>
               <p>{candidate.background}</p>
             </article>
 
             <article className={styles.profilePanel}>
-              <p className={styles.cardLabel}>Background</p>
-              <h3>Indian Air Force veteran</h3>
-              <p>
-                Disciplined service background, practical leadership, and direct exposure to operational responsibility.
-              </p>
+              <p className={styles.cardLabel}>{activeCopy.backgroundLabel}</p>
+              <h3>{activeCopy.backgroundHeading}</h3>
+              <p>{activeCopy.backgroundText}</p>
               <div className={styles.tagList}>
                 {candidate.traits.map((trait) => (
                   <span key={trait}>{trait}</span>
@@ -387,11 +736,9 @@ export function CampaignSite({
             </article>
 
             <article className={styles.profilePanel}>
-              <p className={styles.cardLabel}>Business expertise</p>
-              <h3>Built for chamber decisions</h3>
-              <p>
-                Practical exposure to taxation, labour, banking and compliance matters that directly affect local businesses.
-              </p>
+              <p className={styles.cardLabel}>{activeCopy.expertiseLabel}</p>
+              <h3>{activeCopy.expertiseHeading}</h3>
+              <p>{activeCopy.expertiseText}</p>
               <div className={styles.tagList}>
                 {candidate.expertise.map((item) => (
                   <span key={item}>{item}</span>
@@ -403,8 +750,8 @@ export function CampaignSite({
 
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <p className={styles.sectionKicker}>Business Network</p>
-            <h2>Our Family Businesses.</h2>
+            <p className={styles.sectionKicker}>{activeCopy.businessKicker}</p>
+            <h2>{activeCopy.businessTitle}</h2>
           </div>
           <div className={styles.supporterGrid}>
             {supporters.map((supporter) => (
@@ -431,35 +778,37 @@ export function CampaignSite({
 
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <p className={styles.sectionKicker}>Election Information</p>
-            <h2>Rules & Regulations</h2>
+            <p className={styles.sectionKicker}>{activeCopy.electionKicker}</p>
+            <h2>{activeCopy.electionTitle}</h2>
           </div>
 
           <div className={styles.electionGrid}>
             <article className={styles.infoCard}>
-              <p className={styles.cardLabel}>Voting rules</p>
+              <p className={styles.cardLabel}>{activeCopy.rulesLabel}</p>
               <ul className={styles.ruleList}>
-                {election.rules.map((rule) => (
-                  <li key={rule.text}>{renderHighlightedText(rule.text, rule.highlights)}</li>
+                {election.rules.map((rule, index) => (
+                  <li key={rule.text}>
+                    {renderHighlightedText(activeCopy.electionRules[index] ?? rule.text, [])}
+                  </li>
                 ))}
               </ul>
             </article>
 
             <article className={styles.infoCard}>
-              <p className={styles.cardLabel}>Election calendar</p>
+              <p className={styles.cardLabel}>{activeCopy.calendarLabel}</p>
               <ul className={styles.timelineCalendar}>
-                {election.timeline.map((step) => (
+                {election.timeline.map((step, index) => (
                   <li key={`${step.label}-${step.detail}`} className={styles.timelineItem}>
                     <div className={styles.timelineDateBadge}>{step.date}</div>
                     <div className={styles.timelineContent}>
                       <div className={styles.timelineHeadingRow}>
-                        <strong>{step.label}</strong>
+                        <strong>{activeCopy.timelineLabels[index] ?? step.label}</strong>
                         <span
                           className={
                             step.status === "done" ? styles.timelineDoneCapsule : styles.timelineUpcomingCapsule
                           }
                         >
-                          {step.status === "done" ? "Done" : "Upcoming"}
+                          {step.status === "done" ? activeCopy.doneLabel : activeCopy.upcomingLabel}
                         </span>
                       </div>
                       <span>{step.detail}</span>
@@ -481,23 +830,23 @@ export function CampaignSite({
             <div className={styles.modeRow} role="tablist" aria-label="Eligibility search modes">
               {modes.map((mode) => (
                 <button
-                  key={mode.key}
+                  key={mode}
                   type="button"
-                  className={searchMode === mode.key ? styles.modeActive : styles.modeButton}
-                  onClick={() => setSearchMode(mode.key)}
+                  className={searchMode === mode ? styles.modeActive : styles.modeButton}
+                  onClick={() => setSearchMode(mode)}
                 >
-                  {mode.label}
+                  {activeCopy.modeLabels[mode]}
                 </button>
               ))}
             </div>
 
             <label className={styles.searchInputWrap}>
-              <span>Search</span>
+              <span>{activeCopy.eligibilitySearchLabel}</span>
               <input
                 type="text"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Enter phone, name, business, or address"
+                placeholder={activeCopy.searchPlaceholder}
               />
             </label>
 
@@ -508,19 +857,19 @@ export function CampaignSite({
                 </p>
                 <h3>
                   {hasResults ? `
-                    ${results.length} match${results.length === 1 ? "" : "es"}
-                  `.trim() : "Start by typing a member detail"}
+                    ${results.length} ${activeCopy.matchesLabel}
+                  `.trim() : activeCopy.startTyping}
                 </h3>
                 <p>
                   {hasResults
                     ? results.length
                       ? activeCopy.eligible
                       : activeCopy.notEligible
-                    : "The search runs instantly on the local member dataset."}
+                    : activeCopy.searchRuns}
                 </p>
               </div>
               <span className={results.length ? styles.successPill : styles.warningPill}>
-                {results.length ? "Match found" : "No match"}
+                {results.length ? activeCopy.matchFound : activeCopy.noMatch}
               </span>
             </div>
 
@@ -529,8 +878,8 @@ export function CampaignSite({
                 {results.slice(0, 12).map((record) => (
                   <article className={styles.resultCard} key={`${record.name}-${record.phone}-${record.address}`}>
                     <h4>{record.name}</h4>
-                    <p>{record.address || "Address unavailable"}</p>
-                    <span>{record.phone || "Phone unavailable"}</span>
+                    <p>{record.address || activeCopy.addressUnavailable}</p>
+                    <span>{record.phone || activeCopy.phoneUnavailable}</span>
                     <small>{record.business}</small>
                   </article>
                 ))}
@@ -579,23 +928,23 @@ export function CampaignSite({
               <div className={styles.formGrid}>
                 <form className={styles.submissionForm}>
                   <label>
-                    <span>Name</span>
+                    <span>{activeCopy.formName}</span>
                     <input value={submissionName} onChange={(event) => setSubmissionName(event.target.value)} />
                   </label>
                   <label>
-                    <span>Business</span>
+                    <span>{activeCopy.formBusiness}</span>
                     <input value={submissionBusiness} onChange={(event) => setSubmissionBusiness(event.target.value)} />
                   </label>
                   <label>
-                    <span>Phone</span>
+                    <span>{activeCopy.formPhone}</span>
                     <input value={submissionPhone} onChange={(event) => setSubmissionPhone(event.target.value)} />
                   </label>
                   <label>
-                    <span>Address</span>
+                    <span>{activeCopy.formAddress}</span>
                     <input value={submissionAddress} onChange={(event) => setSubmissionAddress(event.target.value)} />
                   </label>
                   <label>
-                    <span>Notes</span>
+                    <span>{activeCopy.formNotes}</span>
                     <textarea
                       value={submissionNote}
                       onChange={(event) => setSubmissionNote(event.target.value)}
@@ -614,11 +963,9 @@ export function CampaignSite({
                 </form>
 
                 <aside className={styles.sideNote}>
-                  <p className={styles.cardLabel}>Best fallback when no backend is used</p>
-                  <h3>Fast, familiar, and low friction.</h3>
-                  <p>
-                    The form prepares a clean message for WhatsApp or email, so members can submit data without waiting for a login or custom server.
-                  </p>
+                  <p className={styles.cardLabel}>{activeCopy.sideNoteLabel}</p>
+                  <h3>{activeCopy.sideNoteTitle}</h3>
+                  <p>{activeCopy.sideNoteText}</p>
                 </aside>
               </div>
             </div>
@@ -643,9 +990,7 @@ export function CampaignSite({
             <div>
               <p className={styles.cardLabel}>{activeCopy.supportCount}</p>
               <h3>{supportCount}</h3>
-              <p>
-                This is not official voting. It is only a support signal to understand your vote of confidence.
-              </p>
+              <p>{activeCopy.supportNote}</p>
             </div>
           </div>
         </section>
@@ -653,7 +998,7 @@ export function CampaignSite({
         <section className={styles.section} id="contact">
           <div className={styles.sectionHeader}>
             <p className={styles.sectionKicker}>{activeCopy.contactTitle}</p>
-            <h2>Connect with me.</h2>
+            <h2>{activeCopy.contactHeading}</h2>
           </div>
 
           <div className={styles.contactGrid}>
@@ -662,7 +1007,7 @@ export function CampaignSite({
                 <span className={`${styles.contactIcon} ${styles.contactIconPhone}`}>
                   <BiPhoneCall aria-hidden="true" />
                 </span>
-                <span className={styles.contactLabel}>Phone</span>
+                <span className={styles.contactLabel}>{activeCopy.contactPhone}</span>
               </div>
               <strong>{candidate.whatsapp}</strong>
             </a>
@@ -671,7 +1016,7 @@ export function CampaignSite({
                 <span className={`${styles.contactIcon} ${styles.contactIconMail}`}>
                   <BiEnvelope aria-hidden="true" />
                 </span>
-                <span className={styles.contactLabel}>Email</span>
+                <span className={styles.contactLabel}>{activeCopy.contactEmail}</span>
               </div>
               <strong>{candidate.email}</strong>
             </a>
@@ -680,9 +1025,9 @@ export function CampaignSite({
                 <span className={`${styles.contactIcon} ${styles.contactIconWhatsapp}`}>
                   <FaWhatsapp aria-hidden="true" />
                 </span>
-                <span className={styles.contactLabel}>WhatsApp</span>
+                <span className={styles.contactLabel}>{activeCopy.contactWhatsapp}</span>
               </div>
-              <strong>Open direct chat with Kishore</strong>
+              <strong>{activeCopy.contactWhatsappCta}</strong>
             </a>
           </div>
         </section>

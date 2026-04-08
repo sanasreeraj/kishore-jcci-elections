@@ -455,6 +455,391 @@
   display: grid;
   gap: 6px;
   margin-bottom: 12px;
+
+@media (max-width: 980px) {
+  .shell {
+    width: min(100% - 20px, 100%);
+    padding-bottom: 36px;
+  }
+
+  .topbar {
+    top: 8px;
+    padding: 12px;
+    gap: 12px;
+    border-radius: 28px;
+  }
+
+  .brandLockup {
+    max-width: none;
+  }
+
+  .nav {
+    flex: 0 0 auto;
+    width: 100%;
+    order: 3;
+    justify-content: center;
+    row-gap: 6px;
+    font-size: 0.86rem;
+  }
+
+  .languageSwitcher {
+    margin-left: 0;
+    order: 2;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 20px;
+  }
+
+  .heroContent h1 {
+    font-size: clamp(2.4rem, 6.8vw, 4rem);
+  }
+
+  .heroLead {
+    max-width: 100%;
+  }
+
+  .heroVisual {
+    width: 100%;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .heroFrame {
+    width: min(52vw, 360px);
+    flex: 0 0 auto;
+  }
+
+  .heroEmblems {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    align-content: flex-start;
+    gap: 10px;
+  }
+
+  .heroEmblems img {
+    width: 72px;
+    height: 72px;
+    padding: 8px;
+  }
+
+  .heroStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .section {
+    margin-top: 36px;
+  }
+
+  .sectionHeader h2 {
+    max-width: none;
+    font-size: clamp(1.8rem, 4.8vw, 2.5rem);
+  }
+
+  .profileGrid,
+  .supporterGrid,
+  .contactGrid,
+  .electionGrid,
+  .formGrid,
+  .resultsList,
+  .sectionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .supporterCard,
+  .contactCard,
+  .profilePanel,
+  .infoCard,
+  .searchPanel,
+  .submissionForm,
+  .supportPanel,
+  .sideNote {
+    padding: 16px;
+  }
+
+  .supporterImage {
+    max-width: 100%;
+  }
+
+  .formGrid {
+    gap: 14px;
+  }
+
+  .modalCard {
+    max-height: min(90vh, 900px);
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    position: static;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    border-radius: 24px;
+    margin-top: 6px;
+    padding: 10px;
+  }
+
+  .brandLockup,
+  .languageSwitcher,
+  .nav {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nav {
+    gap: 6px 8px;
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .hero,
+  .sectionGrid,
+  .profileGrid,
+  .supporterGrid,
+  .contactGrid,
+  .electionGrid,
+  .formGrid,
+  .resultsList {
+    grid-template-columns: 1fr;
+  }
+
+  .hero,
+  .infoCard,
+  .profilePanel,
+  .supporterCard,
+  .sideNote,
+  .contactCard,
+  .searchPanel,
+  .submissionForm,
+  .supportPanel {
+    padding: 16px;
+  }
+
+  .hero {
+    gap: 16px;
+  }
+
+  .heroContent h1 {
+    font-size: clamp(2.2rem, 12vw, 3.5rem);
+    line-height: 0.96;
+  }
+
+  .heroVisual {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .heroFrame {
+    width: 100%;
+    aspect-ratio: 4 / 4.1;
+  }
+
+  .heroEmblems {
+    justify-content: center;
+  }
+
+  .heroEmblems img {
+    width: 72px;
+    height: 72px;
+  }
+
+  .heroStats {
+    grid-template-columns: 1fr;
+  }
+
+  .heroActions,
+  .formActions,
+  .modeRow,
+  .tagList {
+    gap: 8px;
+  }
+
+  .languageSwitcher {
+    justify-content: center;
+  }
+
+  .nav a {
+    padding: 2px 0;
+  }
+
+  .heroActions a,
+  .formActions a,
+  .supportButton,
+  .missingCtaButton {
+    width: 100%;
+  }
+
+  .supportPanel,
+  .resultBanner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .section {
+    margin-top: 32px;
+  }
+
+  .sectionHeader {
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  .sectionHeader h2 {
+    font-size: clamp(1.65rem, 8vw, 2.2rem);
+    line-height: 1.02;
+  }
+
+  .eligibilityHeading {
+    white-space: normal;
+  }
+
+  .timelineItem {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .timelineHeadingRow {
+    flex-wrap: wrap;
+  }
+
+  .missingCtaWrap {
+    justify-content: stretch;
+  }
+
+  .modalBackdrop {
+    padding: 10px;
+  }
+
+  .modalCard {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .modalHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .contactCard {
+    min-height: 124px;
+  }
+
+  .supporterImage {
+    width: 100%;
+    max-width: none;
+  }
+
+  .contactCard strong,
+  .supporterCard h3,
+  .resultCard h4,
+  .profilePanel h3,
+  .infoCard h3 {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .shell {
+    width: min(100% - 14px, 100%);
+    padding-top: 10px;
+    padding-bottom: 26px;
+  }
+
+  .topbar {
+    padding: 10px;
+    border-radius: 22px;
+    gap: 10px;
+  }
+
+  .brandBadge {
+    width: 56px;
+    height: 56px;
+  }
+
+  .brandTitle {
+    max-width: 100%;
+    font-size: 0.86rem;
+  }
+
+  .nav {
+    font-size: 0.82rem;
+    justify-content: center;
+  }
+
+  .topbar {
+    justify-content: flex-start;
+  }
+
+  .languageButton,
+  .languageActive,
+  .modeButton,
+  .modeActive {
+    padding: 8px 12px;
+    font-size: 0.86rem;
+  }
+
+  .hero,
+  .infoCard,
+  .profilePanel,
+  .supporterCard,
+  .sideNote,
+  .contactCard,
+  .searchPanel,
+  .submissionForm,
+  .supportPanel,
+  .resultCard {
+    border-radius: 18px;
+  }
+
+  .heroContent h1 {
+    font-size: clamp(2rem, 12.5vw, 3.1rem);
+  }
+
+  .heroLead,
+  .resultBanner p,
+  .supporterLocation,
+  .supporterContact,
+  .sideNote p,
+  .contactCard span,
+  .timelineContent span,
+  .ruleList li {
+    font-size: 0.92rem;
+  }
+
+  .supporterImage {
+    width: 100%;
+    max-width: none;
+    aspect-ratio: 1 / 1.08;
+  }
+
+  .resultBanner {
+    padding: 16px;
+  }
+
+  .resultsList {
+    gap: 12px;
+  }
+
+  .missingCtaButton,
+  .primaryAction,
+  .secondaryAction,
+  .supportButton,
+  .modalCloseButton {
+    min-height: 44px;
+  }
+
+  .heroFrame {
+    aspect-ratio: 4 / 4.3;
+  }
+}
 }
 
 .sectionHeader h2 {
@@ -996,7 +1381,6 @@
 }
 
 @media (max-width: 1080px) {
-  .hero,
   .formGrid,
   .sectionGrid,
   .profileGrid,
@@ -1006,12 +1390,76 @@
     grid-template-columns: 1fr 1fr;
   }
 
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
   .heroVisual {
-    grid-column: 1 / -1;
+    grid-column: auto;
+    width: 100%;
+    align-items: center;
+  }
+
+  .heroFrame {
+    width: min(100%, 460px);
+  }
+
+  .topbar {
+    gap: 10px;
+    border-radius: 28px;
+    padding: 12px;
+  }
+
+  .nav {
+    flex: 0 0 auto;
+    width: 100%;
+    justify-content: center;
+    row-gap: 6px;
+  }
+
+  .languageSwitcher {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .supporterImage {
+    width: 100%;
+    max-width: none;
+  }
+
+  .heroStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sectionHeader h2 {
-    max-width: 22ch;
+    max-width: none;
+    font-size: clamp(1.9rem, 4.2vw, 2.8rem);
+  }
+
+  .section {
+    margin-top: 34px;
+  }
+}
+
+@media (max-width: 900px) {
+  .formGrid,
+  .sectionGrid,
+  .profileGrid,
+  .supporterGrid,
+  .contactGrid,
+  .electionGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .heroFrame {
+    width: min(100%, 430px);
+  }
+
+  .heroEmblems img {
+    width: 78px;
+    height: 78px;
   }
 }
 
@@ -1025,6 +1473,9 @@
     position: static;
     flex-direction: column;
     align-items: stretch;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 10px;
     border-radius: 28px;
     margin-top: 6px;
   }
@@ -1034,6 +1485,18 @@
   .nav {
     justify-content: center;
     flex-wrap: wrap;
+  }
+
+  .nav {
+    flex: 0 0 auto;
+    width: 100%;
+    row-gap: 6px;
+  }
+
+  .languageSwitcher {
+    width: 100%;
+    margin-left: 0;
+    justify-content: center;
   }
 
   .hero,
@@ -1113,6 +1576,11 @@
 
   .timelineHeadingRow {
     flex-wrap: wrap;
+  }
+
+  .supporterImage {
+    max-width: none;
+    width: 100%;
   }
 }
 
