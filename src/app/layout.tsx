@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: "Ch Kishore Kumar | JCCI Director Campaign",
   description:
     "A mobile-first campaign website for Ch Kishore Kumar, Director candidate for JCCI Election 2026-27.",
+  icons: {
+    icon: "/assets/ballot-number.png",
+  },
 };
 
 export default function RootLayout({
