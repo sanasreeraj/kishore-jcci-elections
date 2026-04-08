@@ -410,7 +410,13 @@ export function CampaignSite({
             {supporters.map((supporter) => (
               <article className={styles.supporterCard} key={`${supporter.name}-${supporter.business}`}>
                 <div className={styles.supporterImage} aria-hidden="true">
-                  {getInitials(supporter.name)}
+                  <Image
+                    src={supporter.image}
+                    alt={supporter.name}
+                    fill
+                    className={styles.supporterPortrait}
+                    sizes="(max-width: 760px) 100vw, (max-width: 1080px) 50vw, 25vw"
+                  />
                 </div>
                 <h3>{supporter.name}</h3>
                 <p className={styles.supporterCompany}>{supporter.business}</p>

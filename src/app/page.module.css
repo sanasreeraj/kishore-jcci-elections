@@ -504,18 +504,19 @@
 }
 
 .supporterImage {
+  position: relative;
   width: 100%;
   max-width: 260px;
   aspect-ratio: 1 / 1;
   border-radius: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: var(--accent-strong);
+  overflow: hidden;
   border: 1px solid rgba(37, 99, 235, 0.18);
   background: linear-gradient(135deg, rgba(219, 234, 254, 0.96), rgba(240, 249, 255, 0.95));
+}
+
+.supporterPortrait {
+  object-fit: cover;
+  object-position: center top;
 }
 
 .supporterCompany {

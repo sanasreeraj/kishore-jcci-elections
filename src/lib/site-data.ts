@@ -16,6 +16,7 @@ export type Supporter = {
   business: string;
   location: string;
   phone: string;
+  image: string;
 };
 
 export type CandidateProfile = {
@@ -81,24 +82,28 @@ export const supporters: Supporter[] = [
     business: "Shiv Shankar Traders",
     location: "Daily Market, Jeypore",
     phone: "+91 9437693955",
+    image: "/assets/chandrarao.png",
   },
   {
     name: "Ch Kiran Kumar",
     business: "Sri Maa Bankeswari Industries",
     location: "Jamunda",
     phone: "+91 9938002342",
-  },
-  {
-    name: "Kota Ramu",
-    business: "Sai Sampath Medicals",
-    location: "Main Road, Jeypore",
-    phone: "+91 9040693465",
+    image: "/assets/kiran.png",
   },
   {
     name: "Sana Srinu",
     business: "Sri Sai Surya Chandra Industries",
     location: "Boipariguda",
     phone: "+91 9438544088",
+    image: "/assets/srinu.png",
+  },
+  {
+    name: "Kota Ramu",
+    business: "Sai Sampath Medicals",
+    location: "Main Road, Jeypore",
+    phone: "+91 9040693465",
+    image: "/assets/ramu.png",
   },
 ];
 
