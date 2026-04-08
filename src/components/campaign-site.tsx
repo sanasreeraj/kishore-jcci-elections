@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { BiNavigation } from "react-icons/bi";
+import { BiEnvelope, BiNavigation, BiPhoneCall } from "react-icons/bi";
+import { FaWhatsapp } from "react-icons/fa6";
 
 import type { CandidateProfile, ElectionInfo, MemberRecord, Supporter } from "@/lib/site-data";
 import { searchMembers } from "@/lib/search";
@@ -29,19 +30,22 @@ const copy = {
     secondary: "Check Eligibility",
     tertiary: "View Details",
     searchTitle: "Check Eligibility",
-    searchLead: "Check whether you are eligible using phone number, name, business name, or address.",
+    searchLead: "Check whether you are eligible.",
     supportTitle: "Support Signal",
-    supportLead:
-      "Tap once to record your support on this device. It is a local campaign signal, not an official vote count.",
+    supportLead: "Show some support.",
     submissionTitle: "Add Missing Member Data",
     submissionLead:
       "If your record is missing, send it instantly through WhatsApp or email using the same details below.",
+    submissionCta: "Missing? Add here.",
+    close: "Close",
     contactTitle: "Contact",
     resultFound: "Found in the local member list",
     resultNotFound: "Not found in the local member list",
     eligible: "Likely eligible based on this record",
     notEligible: "No match found yet",
-    supportCount: "Support taps on this device",
+    supportCount: "Support taps",
+    supportButton: "I Support Kishore Kumar",
+    supportButtonThanks: "Thank you for your support",
     submit: "Send via WhatsApp",
     email: "Send by Email",
   },
@@ -62,12 +66,16 @@ const copy = {
     submissionTitle: "ଅନୁପସ୍ଥିତ ତଥ୍ୟ ଯୋଡନ୍ତୁ",
     submissionLead:
       "ରେକର୍ଡ ନଥିଲେ, ସେହି ସୂଚନା WhatsApp କିମ୍ବା Email ମାଧ୍ୟମରେ ପଠାନ୍ତୁ।",
+    submissionCta: "ମିସିଂ? ଏଠାରେ ଯୋଡନ୍ତୁ।",
+    close: "ବନ୍ଦ କରନ୍ତୁ",
     contactTitle: "ଯୋଗାଯୋଗ",
     resultFound: "ସ୍ଥାନୀୟ ମେମ୍ବର ତାଲିକାରେ ମିଳିଲା",
     resultNotFound: "ସ୍ଥାନୀୟ ତାଲିକାରେ ମିଳିଲା ନାହିଁ",
     eligible: "ଏହି ରେକର୍ଡ ଅନୁଯାୟୀ ଯୋଗ୍ୟ",
     notEligible: "ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ମ୍ୟାଚ୍ ନାହିଁ",
     supportCount: "ଏହି ଡିଭାଇସର ସମର୍ଥନ ସଂଖ୍ୟା",
+    supportButton: "ମୁଁ କିଶୋର କୁମାରଙ୍କୁ ସମର୍ଥନ କରେ",
+    supportButtonThanks: "ଆପଣଙ୍କ ସମର୍ଥନ ପାଇଁ ଧନ୍ୟବାଦ",
     submit: "WhatsApp ରେ ପଠାନ୍ତୁ",
     email: "Email ରେ ପଠାନ୍ତୁ",
   },
@@ -88,12 +96,16 @@ const copy = {
     submissionTitle: "మిస్సింగ్ డేటా జోడించండి",
     submissionLead:
       "రికార్డు లేనప్పుడు, అదే వివరాలతో WhatsApp లేదా Email ద్వారా పంపండి.",
+    submissionCta: "మిస్సింగ్? ఇక్కడ జోడించండి.",
+    close: "మూసివేయండి",
     contactTitle: "కాంటాక్ట్",
     resultFound: "స్థానిక సభ్యుల జాబితాలో దొరికింది",
     resultNotFound: "స్థానిక జాబితాలో దొరకలేదు",
     eligible: "ఈ రికార్డు ఆధారంగా అర్హత ఉంది",
     notEligible: "ఇంకా మ్యాచ్ లేదు",
     supportCount: "ఈ పరికరంలో సపోర్ట్ ట్యాప్స్",
+    supportButton: "నేను కిశోర్ కుమార్‌కు మద్దతు ఇస్తున్నాను",
+    supportButtonThanks: "మీ మద్దతుకు ధన్యవాదాలు",
     submit: "WhatsApp ద్వారా పంపండి",
     email: "Email ద్వారా పంపండి",
   },
@@ -157,28 +169,42 @@ export function CampaignSite({
   supporters,
   memberRecords,
 }: Props) {
+  const supportFlagKey = "kishore-support-locked";
   const [language, setLanguage] = useState<LanguageKey>("en");
   const [searchMode, setSearchMode] = useState<SearchMode>("all");
   const [query, setQuery] = useState("");
   const [supportCount, setSupportCount] = useState(0);
+  const [hasSupported, setHasSupported] = useState(false);
+  const [supportLoading, setSupportLoading] = useState(false);
   const [submissionName, setSubmissionName] = useState("");
   const [submissionBusiness, setSubmissionBusiness] = useState("");
   const [submissionPhone, setSubmissionPhone] = useState("");
   const [submissionAddress, setSubmissionAddress] = useState("");
   const [submissionNote, setSubmissionNote] = useState("");
+  const [isMissingModalOpen, setIsMissingModalOpen] = useState(false);
 
   useEffect(() => {
-    const storedValue = window.localStorage.getItem("kishore-support-count");
-    const parsedValue = storedValue ? Number(storedValue) : 0;
+    const isLocked = window.localStorage.getItem(supportFlagKey) === "1";
+    setHasSupported(isLocked);
 
-    if (!Number.isNaN(parsedValue)) {
-      setSupportCount(parsedValue);
+    async function loadSupportCount() {
+      try {
+        const response = await fetch("/api/support", { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as { count?: number };
+        if (typeof payload.count === "number") {
+          setSupportCount(payload.count);
+        }
+      } catch {
+        // Keep zero when the API is temporarily unavailable.
+      }
     }
-  }, []);
 
-  useEffect(() => {
-    window.localStorage.setItem("kishore-support-count", String(supportCount));
-  }, [supportCount]);
+    void loadSupportCount();
+  }, []);
 
   const results = useMemo(() => searchMembers(memberRecords, query, searchMode), [
     memberRecords,
@@ -195,13 +221,41 @@ export function CampaignSite({
 
   const whatsappLink =
     `https://wa.me/${phoneDigits}?text=` + encodeURIComponent(supportMessage.trim());
+  const directWhatsAppLink = `https://wa.me/${phoneDigits}`;
   const emailLink =
     `mailto:${candidate.email}?subject=${encodeURIComponent(
       "JCCI member detail submission",
     )}&body=${encodeURIComponent(supportMessage.trim())}`;
 
-  function incrementSupport() {
-    setSupportCount((current) => current + 1);
+  async function incrementSupport() {
+    if (hasSupported || supportLoading) {
+      return;
+    }
+
+    setSupportLoading(true);
+
+    try {
+      const response = await fetch("/api/support", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const payload = (await response.json()) as { count?: number };
+      if (typeof payload.count === "number") {
+        setSupportCount(payload.count);
+      }
+
+      setHasSupported(true);
+      window.localStorage.setItem(supportFlagKey, "1");
+    } finally {
+      setSupportLoading(false);
+    }
   }
 
   return (
@@ -414,7 +468,7 @@ export function CampaignSite({
         <section className={styles.section} id="eligibility">
           <div className={styles.sectionHeader}>
             <p className={styles.sectionKicker}>{activeCopy.searchTitle}</p>
-            <h2>{activeCopy.searchLead}</h2>
+            <h2 className={styles.eligibilityHeading}>{activeCopy.searchLead}</h2>
           </div>
 
           <div className={styles.searchPanel}>
@@ -464,67 +518,106 @@ export function CampaignSite({
               </span>
             </div>
 
-            <div className={styles.resultsList}>
-              {(hasResults ? results.slice(0, 12) : memberRecords.slice(0, 4)).map((record) => (
-                <article className={styles.resultCard} key={`${record.name}-${record.phone}-${record.address}`}>
-                  <h4>{record.name}</h4>
-                  <p>{record.address || "Address unavailable"}</p>
-                  <span>{record.phone || "Phone unavailable"}</span>
-                  <small>{record.business}</small>
-                </article>
-              ))}
+            {hasResults && results.length > 0 ? (
+              <div className={styles.resultsList}>
+                {results.slice(0, 12).map((record) => (
+                  <article className={styles.resultCard} key={`${record.name}-${record.phone}-${record.address}`}>
+                    <h4>{record.name}</h4>
+                    <p>{record.address || "Address unavailable"}</p>
+                    <span>{record.phone || "Phone unavailable"}</span>
+                    <small>{record.business}</small>
+                  </article>
+                ))}
+              </div>
+            ) : null}
+
+            <div className={styles.missingCtaWrap}>
+              <button
+                type="button"
+                className={styles.missingCtaButton}
+                onClick={() => setIsMissingModalOpen(true)}
+              >
+                {activeCopy.submissionCta}
+              </button>
             </div>
           </div>
         </section>
 
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <p className={styles.sectionKicker}>{activeCopy.submissionTitle}</p>
-            <h2>{activeCopy.submissionLead}</h2>
-          </div>
-
-          <div className={styles.formGrid}>
-            <form className={styles.submissionForm}>
-              <label>
-                <span>Name</span>
-                <input value={submissionName} onChange={(event) => setSubmissionName(event.target.value)} />
-              </label>
-              <label>
-                <span>Business</span>
-                <input value={submissionBusiness} onChange={(event) => setSubmissionBusiness(event.target.value)} />
-              </label>
-              <label>
-                <span>Phone</span>
-                <input value={submissionPhone} onChange={(event) => setSubmissionPhone(event.target.value)} />
-              </label>
-              <label>
-                <span>Address</span>
-                <input value={submissionAddress} onChange={(event) => setSubmissionAddress(event.target.value)} />
-              </label>
-              <label>
-                <span>Notes</span>
-                <textarea value={submissionNote} onChange={(event) => setSubmissionNote(event.target.value)} rows={4} />
-              </label>
-
-              <div className={styles.formActions}>
-                <a className={styles.primaryAction} href={whatsappLink} target="_blank" rel="noreferrer">
-                  {activeCopy.submit}
-                </a>
-                <a className={styles.secondaryAction} href={emailLink}>
-                  {activeCopy.email}
-                </a>
+        {isMissingModalOpen ? (
+          <div
+            className={styles.modalBackdrop}
+            role="dialog"
+            aria-modal="true"
+            aria-label={activeCopy.submissionTitle}
+            onClick={(event) => {
+              if (event.target === event.currentTarget) {
+                setIsMissingModalOpen(false);
+              }
+            }}
+          >
+            <div className={styles.modalCard}>
+              <div className={styles.modalHeader}>
+                <div>
+                  <p className={styles.sectionKicker}>{activeCopy.submissionTitle}</p>
+                  <h3>{activeCopy.submissionLead}</h3>
+                </div>
+                <button
+                  type="button"
+                  className={styles.modalCloseButton}
+                  onClick={() => setIsMissingModalOpen(false)}
+                >
+                  {activeCopy.close}
+                </button>
               </div>
-            </form>
 
-            <aside className={styles.sideNote}>
-              <p className={styles.cardLabel}>Best fallback when no backend is used</p>
-              <h3>Fast, familiar, and low friction.</h3>
-              <p>
-                The form prepares a clean message for WhatsApp or email, so members can submit data without waiting for a login or custom server.
-              </p>
-            </aside>
+              <div className={styles.formGrid}>
+                <form className={styles.submissionForm}>
+                  <label>
+                    <span>Name</span>
+                    <input value={submissionName} onChange={(event) => setSubmissionName(event.target.value)} />
+                  </label>
+                  <label>
+                    <span>Business</span>
+                    <input value={submissionBusiness} onChange={(event) => setSubmissionBusiness(event.target.value)} />
+                  </label>
+                  <label>
+                    <span>Phone</span>
+                    <input value={submissionPhone} onChange={(event) => setSubmissionPhone(event.target.value)} />
+                  </label>
+                  <label>
+                    <span>Address</span>
+                    <input value={submissionAddress} onChange={(event) => setSubmissionAddress(event.target.value)} />
+                  </label>
+                  <label>
+                    <span>Notes</span>
+                    <textarea
+                      value={submissionNote}
+                      onChange={(event) => setSubmissionNote(event.target.value)}
+                      rows={4}
+                    />
+                  </label>
+
+                  <div className={styles.formActions}>
+                    <a className={styles.primaryAction} href={whatsappLink} target="_blank" rel="noreferrer">
+                      {activeCopy.submit}
+                    </a>
+                    <a className={styles.secondaryAction} href={emailLink}>
+                      {activeCopy.email}
+                    </a>
+                  </div>
+                </form>
+
+                <aside className={styles.sideNote}>
+                  <p className={styles.cardLabel}>Best fallback when no backend is used</p>
+                  <h3>Fast, familiar, and low friction.</h3>
+                  <p>
+                    The form prepares a clean message for WhatsApp or email, so members can submit data without waiting for a login or custom server.
+                  </p>
+                </aside>
+              </div>
+            </div>
           </div>
-        </section>
+        ) : null}
 
         <section className={styles.section} id="support">
           <div className={styles.sectionHeader}>
@@ -533,13 +626,20 @@ export function CampaignSite({
           </div>
 
           <div className={styles.supportPanel}>
-            <button type="button" className={styles.supportButton} onClick={incrementSupport}>
-              I Support Kishore Kumar
+            <button
+              type="button"
+              className={`${styles.supportButton} ${hasSupported ? styles.supportButtonDone : ""}`}
+              onClick={incrementSupport}
+              disabled={hasSupported || supportLoading}
+            >
+              {hasSupported ? activeCopy.supportButtonThanks : activeCopy.supportButton}
             </button>
             <div>
               <p className={styles.cardLabel}>{activeCopy.supportCount}</p>
               <h3>{supportCount}</h3>
-              <p>Stored locally in this browser for a quick visual signal.</p>
+              <p>
+                This is not official voting. It is only a support signal to understand your vote of confidence.
+              </p>
             </div>
           </div>
         </section>
@@ -547,21 +647,36 @@ export function CampaignSite({
         <section className={styles.section} id="contact">
           <div className={styles.sectionHeader}>
             <p className={styles.sectionKicker}>{activeCopy.contactTitle}</p>
-            <h2>Reach the campaign in one tap.</h2>
+            <h2>Connect with me.</h2>
           </div>
 
           <div className={styles.contactGrid}>
             <a className={styles.contactCard} href={`tel:${normalizePhone(candidate.whatsapp)}`}>
-              <span>Phone</span>
+              <div className={styles.contactCardHead}>
+                <span className={`${styles.contactIcon} ${styles.contactIconPhone}`}>
+                  <BiPhoneCall aria-hidden="true" />
+                </span>
+                <span className={styles.contactLabel}>Phone</span>
+              </div>
               <strong>{candidate.whatsapp}</strong>
             </a>
             <a className={styles.contactCard} href={`mailto:${candidate.email}`}>
-              <span>Email</span>
+              <div className={styles.contactCardHead}>
+                <span className={`${styles.contactIcon} ${styles.contactIconMail}`}>
+                  <BiEnvelope aria-hidden="true" />
+                </span>
+                <span className={styles.contactLabel}>Email</span>
+              </div>
               <strong>{candidate.email}</strong>
             </a>
-            <a className={styles.contactCard} href={whatsappLink} target="_blank" rel="noreferrer">
-              <span>WhatsApp</span>
-              <strong>Open a prefilled message</strong>
+            <a className={styles.contactCard} href={directWhatsAppLink} target="_blank" rel="noreferrer">
+              <div className={styles.contactCardHead}>
+                <span className={`${styles.contactIcon} ${styles.contactIconWhatsapp}`}>
+                  <FaWhatsapp aria-hidden="true" />
+                </span>
+                <span className={styles.contactLabel}>WhatsApp</span>
+              </div>
+              <strong>Open direct chat with Kishore</strong>
             </a>
           </div>
         </section>
