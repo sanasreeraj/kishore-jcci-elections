@@ -4,7 +4,7 @@ import { kv } from "@vercel/kv";
 export const dynamic = "force-dynamic";
 
 const SUPPORT_COUNTER_KEY = "kishore:campaign:support-count";
-let memorySupportCounter = 0;
+let memorySupportCounter = 121;
 
 async function getSupportCount() {
   try {

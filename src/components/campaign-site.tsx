@@ -524,7 +524,7 @@ export function CampaignSite({
   const [language, setLanguage] = useState<LanguageKey>("en");
   const [searchMode, setSearchMode] = useState<SearchMode>("all");
   const [query, setQuery] = useState("");
-  const [supportCount, setSupportCount] = useState(0);
+  const [supportCount, setSupportCount] = useState(121);
   const [hasSupported, setHasSupported] = useState(false);
   const [supportLoading, setSupportLoading] = useState(false);
   const [submissionName, setSubmissionName] = useState("");
