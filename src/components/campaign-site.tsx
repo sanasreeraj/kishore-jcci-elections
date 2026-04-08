@@ -29,8 +29,7 @@ const copy = {
     secondary: "Check Eligibility",
     tertiary: "View Details",
     searchTitle: "Check Eligibility",
-    searchLead:
-      "Search the member list by phone number, name, business name, or address.",
+    searchLead: "Check whether you are eligible using phone number, name, business name, or address.",
     supportTitle: "Support Signal",
     supportLead:
       "Tap once to record your support on this device. It is a local campaign signal, not an official vote count.",
@@ -125,6 +124,31 @@ function getInitials(name: string) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("");
+}
+
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function renderHighlightedText(text: string, highlights: string[] = []) {
+  if (!highlights.length) {
+    return text;
+  }
+
+  const highlightRegex = new RegExp(`(${highlights.map(escapeRegex).join("|")})`, "gi");
+  const chunks = text.split(highlightRegex);
+
+  return chunks.map((chunk, index) => {
+    const isHighlighted = highlights.some(
+      (highlight) => highlight.toLowerCase() === chunk.toLowerCase(),
+    );
+
+    return (
+      <span key={`${chunk}-${index}`} className={isHighlighted ? styles.ruleEmphasis : undefined}>
+        {chunk}
+      </span>
+    );
+  });
 }
 
 export function CampaignSite({
@@ -353,28 +377,33 @@ export function CampaignSite({
 
           <div className={styles.electionGrid}>
             <article className={styles.infoCard}>
-              <p className={styles.cardLabel}>Date and venue</p>
-              <h3>{election.date}</h3>
-              <p>{election.time}</p>
-              <p>{election.venue}</p>
-            </article>
-
-            <article className={styles.infoCard}>
               <p className={styles.cardLabel}>Voting rules</p>
               <ul className={styles.ruleList}>
                 {election.rules.map((rule) => (
-                  <li key={rule}>{rule}</li>
+                  <li key={rule.text}>{renderHighlightedText(rule.text, rule.highlights)}</li>
                 ))}
               </ul>
             </article>
 
             <article className={styles.infoCard}>
-              <p className={styles.cardLabel}>Timeline</p>
-              <ul className={styles.timelineList}>
+              <p className={styles.cardLabel}>Election calendar</p>
+              <ul className={styles.timelineCalendar}>
                 {election.timeline.map((step) => (
-                  <li key={step.label}>
-                    <strong>{step.label}</strong>
-                    <span>{step.detail}</span>
+                  <li key={`${step.label}-${step.detail}`} className={styles.timelineItem}>
+                    <div className={styles.timelineDateBadge}>{step.date}</div>
+                    <div className={styles.timelineContent}>
+                      <div className={styles.timelineHeadingRow}>
+                        <strong>{step.label}</strong>
+                        <span
+                          className={
+                            step.status === "done" ? styles.timelineDoneCapsule : styles.timelineUpcomingCapsule
+                          }
+                        >
+                          {step.status === "done" ? "Done" : "Upcoming"}
+                        </span>
+                      </div>
+                      <span>{step.detail}</span>
+                    </div>
                   </li>
                 ))}
               </ul>

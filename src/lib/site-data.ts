@@ -38,8 +38,13 @@ export type ElectionInfo = {
   date: string;
   time: string;
   venue: string;
-  rules: string[];
-  timeline: Array<{ label: string; detail: string }>;
+  rules: Array<{ text: string; highlights?: string[] }>;
+  timeline: Array<{
+    label: string;
+    date: string;
+    detail: string;
+    status: "done" | "upcoming";
+  }>;
 };
 
 export const candidateProfile: CandidateProfile = {
@@ -103,18 +108,72 @@ export const electionInfo: ElectionInfo = {
   time: "9:00 AM to 3:00 PM",
   venue: "VEDIKA, Nehru Nagar, Jeypore (K), Odisha",
   rules: [
-    "Members must choose exactly 21 Directors.",
-    "Proxy voting is not allowed.",
-    "Only eligible proprietors, directors, or partners can vote.",
-    "The final voter list was published on 06.04.2026.",
+    {
+      text: "Members must choose exactly 21 Directors, not more or less, to keep the ballot valid.",
+      highlights: ["exactly 21 Directors"],
+    },
+    {
+      text: "Proxy Voting is not allowed.",
+      highlights: ["Proxy Voting"],
+    },
+    {
+      text: "Membership enrollment deadline was 15.03.2026 up to 5:00 PM.",
+      highlights: ["15.03.2026", "5:00 PM"],
+    },
+    {
+      text: "Only traders who paid membership fee for 2025-2026 (Rs. 500/- per establishment) can vote.",
+      highlights: ["2025-2026", "Rs. 500/-"],
+    },
+    {
+      text: "Final voter list publication: 06.04.2026.",
+      highlights: ["06.04.2026"],
+    },
+    {
+      text: "Candidate eligibility: any one Proprietor, Director, or Partner of a firm/company.",
+      highlights: ["Proprietor", "Director", "Partner"],
+    },
+    {
+      text: "Voting right: any one Proprietor, Director, or Partner can cast the vote.",
+      highlights: ["Voting right", "Proprietor", "Director", "Partner"],
+    },
   ],
   timeline: [
-    { label: "Nomination filing", detail: "30.03.2026 to 01.04.2026" },
-    { label: "Scrutiny & finalisation", detail: "02.04.2026" },
-    { label: "Withdrawal deadline", detail: "03.04.2026 up to 5:00 PM" },
-    { label: "Final candidate list", detail: "04.04.2026" },
-    { label: "Voting", detail: "12.04.2026, 9:00 AM to 3:00 PM" },
-    { label: "Counting", detail: "12.04.2026 after 3:30 PM" },
+    {
+      label: "Nomination filing",
+      date: "30 Mar - 01 Apr",
+      detail: "30.03.2026 to 01.04.2026",
+      status: "done",
+    },
+    {
+      label: "Scrutiny & finalisation",
+      date: "02 Apr",
+      detail: "02.04.2026",
+      status: "done",
+    },
+    {
+      label: "Withdrawal deadline",
+      date: "03 Apr",
+      detail: "03.04.2026 up to 5:00 PM",
+      status: "done",
+    },
+    {
+      label: "Final candidate list",
+      date: "04 Apr",
+      detail: "04.04.2026",
+      status: "done",
+    },
+    {
+      label: "Voting",
+      date: "12 Apr",
+      detail: "12.04.2026, 9:00 AM to 3:00 PM",
+      status: "upcoming",
+    },
+    {
+      label: "Counting",
+      date: "12 Apr",
+      detail: "12.04.2026 after 3:30 PM",
+      status: "upcoming",
+    },
   ],
 };
 
@@ -133,18 +192,28 @@ function normalizePhone(value: string) {
 }
 
 function getDataFilePath() {
-  return path.resolve(
-    process.cwd(),
-    "..",
-    "Data",
-    "JCCI - Members List FY 2026-2027  - Master Sheet.csv",
-  );
+  const candidates = [
+    path.resolve(
+      process.cwd(),
+      "..",
+      "Data",
+      "JCCI - Members List FY 2026-2027  - Master Sheet.csv",
+    ),
+    path.resolve(
+      process.cwd(),
+      "public",
+      "data",
+      "members.csv",
+    ),
+  ];
+
+  return candidates.find((candidatePath) => fs.existsSync(candidatePath));
 }
 
 export function loadMemberRecords(): MemberRecord[] {
   const csvPath = getDataFilePath();
 
-  if (!fs.existsSync(csvPath)) {
+  if (!csvPath) {
     return [];
   }
 

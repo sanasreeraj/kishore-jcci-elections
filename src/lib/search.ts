@@ -31,7 +31,7 @@ export function searchMembers(records: MemberRecord[], query: string, mode: stri
 
       let score = 0;
 
-      if (mode === "phone") {
+      if (mode === "phone" || mode === "all") {
         if (phoneKey === phoneQuery) score += 100;
         else if (phoneKey.includes(phoneQuery)) score += 60;
       }
