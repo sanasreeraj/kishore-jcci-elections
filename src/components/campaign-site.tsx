@@ -788,7 +788,7 @@ export function CampaignSite({
               <ul className={styles.ruleList}>
                 {election.rules.map((rule, index) => (
                   <li key={rule.text}>
-                    {renderHighlightedText(activeCopy.electionRules[index] ?? rule.text, [])}
+                    {renderHighlightedText(activeCopy.electionRules[index] ?? rule.text, rule.highlights)}
                   </li>
                 ))}
               </ul>
