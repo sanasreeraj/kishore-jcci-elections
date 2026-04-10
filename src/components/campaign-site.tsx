@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { BiEnvelope, BiNavigation, BiPhoneCall } from "react-icons/bi";
 import { FaWhatsapp } from "react-icons/fa6";
 
@@ -62,6 +62,11 @@ type CampaignCopy = {
   notEligible: string;
   startTyping: string;
   searchRuns: string;
+  slotTitle: string;
+  slotLead: string;
+  slotPeople: string;
+  slotSelectOne: string;
+  slotSelectedPrefix: string;
   matchFound: string;
   noMatch: string;
   matchesLabel: string;
@@ -98,7 +103,7 @@ type CampaignCopy = {
 const copy: Record<LanguageKey, CampaignCopy> = {
   en: {
     nav: ["Home", "Profile", "Eligibility", "Support", "Contact"],
-    modeLabels: { all: "All", phone: "Phone", name: "Name", business: "Business", address: "Address" },
+    modeLabels: { all: "All", phone: "Phone", name: "Sl No", business: "Establishment", address: "Address" },
     heroEyebrow: "JCCI Election 2026-27",
     heroTitle: "Vote for Director",
     heroLead:
@@ -150,7 +155,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     searchTitle: "Check Eligibility",
     searchLead: "Check whether you are eligible.",
     eligibilitySearchLabel: "Search",
-    searchPlaceholder: "Enter phone, name, business, or address",
+    searchPlaceholder: "Enter Sl No, address, establishment, or phone",
     supportTitle: "Support Signal",
     supportLead: "Show some support.",
     resultFound: "Found in the local member list",
@@ -159,6 +164,11 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     notEligible: "No match found yet",
     startTyping: "Start by typing a member detail",
     searchRuns: "The search runs instantly on the local member dataset.",
+    slotTitle: "Arrival Slot Planner",
+    slotLead: "Election timing is 9:00 AM to 3:00 PM. Pick one 15-minute arrival slot.",
+    slotPeople: "people",
+    slotSelectOne: "Select one slot. Tap the same selected slot to unlock and choose a different one.",
+    slotSelectedPrefix: "Selected slot:",
     matchFound: "Match found",
     noMatch: "No match",
     matchesLabel: "matches",
@@ -194,7 +204,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
   },
   hi: {
     nav: ["होम", "प्रोफाइल", "पात्रता", "समर्थन", "संपर्क"],
-    modeLabels: { all: "सभी", phone: "फोन", name: "नाम", business: "व्यवसाय", address: "पता" },
+    modeLabels: { all: "सभी", phone: "फोन", name: "क्रम संख्या", business: "प्रतिष्ठान", address: "पता" },
     heroEyebrow: "JCCI चुनाव 2026-27",
     heroTitle: "Director के लिए वोट दें",
     heroLead:
@@ -245,7 +255,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     searchTitle: "पात्रता जांचें",
     searchLead: "जांचें कि आप पात्र हैं या नहीं।",
     eligibilitySearchLabel: "खोज",
-    searchPlaceholder: "फोन, नाम, व्यवसाय या पता दर्ज करें",
+    searchPlaceholder: "क्रम संख्या, पता, प्रतिष्ठान या फोन दर्ज करें",
     supportTitle: "समर्थन संकेत",
     supportLead: "कुछ समर्थन दिखाएं।",
     resultFound: "स्थानीय सदस्य सूची में मिला",
@@ -254,6 +264,11 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     notEligible: "अभी तक कोई मिलान नहीं मिला",
     startTyping: "किसी सदस्य का विवरण टाइप करके शुरू करें",
     searchRuns: "यह खोज स्थानीय सदस्य डेटा पर तुरंत चलती है।",
+    slotTitle: "आगमन स्लॉट योजना",
+    slotLead: "चुनाव समय 9:00 AM से 3:00 PM है। एक 15-मिनट का स्लॉट चुनें।",
+    slotPeople: "लोग",
+    slotSelectOne: "एक स्लॉट चुनें। उसी चुने हुए स्लॉट पर फिर क्लिक करने से अनलॉक होगा और आप दूसरा स्लॉट चुन सकेंगे।",
+    slotSelectedPrefix: "चुना हुआ स्लॉट:",
     matchFound: "मिलान मिला",
     noMatch: "कोई मिलान नहीं",
     matchesLabel: "मिलान",
@@ -288,7 +303,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
   },
   or: {
     nav: ["ମୁଖ୍ୟ", "ପ୍ରୋଫାଇଲ୍", "ଯୋଗ୍ୟତା", "ସମର୍ଥନ", "ଯୋଗାଯୋଗ"],
-    modeLabels: { all: "ସବୁ", phone: "ଫୋନ୍", name: "ନାମ", business: "ବ୍ୟବସାୟ", address: "ଠିକଣା" },
+    modeLabels: { all: "ସବୁ", phone: "ଫୋନ୍", name: "କ୍ରମ ସଂଖ୍ୟା", business: "ପ୍ରତିଷ୍ଠାନ", address: "ଠିକଣା" },
     heroEyebrow: "JCCI ନିର୍ବାଚନ 2026-27",
     heroTitle: "Director ପାଇଁ ଭୋଟ ଦିଅନ୍ତୁ",
     heroLead:
@@ -339,7 +354,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     searchTitle: "ଯୋଗ୍ୟତା ଯାଞ୍ଚ",
     searchLead: "ଆପଣ ଯୋଗ୍ୟ କି ନାହିଁ ଯାଞ୍ଚ କରନ୍ତୁ।",
     eligibilitySearchLabel: "ଖୋଜନ୍ତୁ",
-    searchPlaceholder: "ଫୋନ୍, ନାମ, ବ୍ୟବସାୟ କିମ୍ବା ଠିକଣା ଲେଖନ୍ତୁ",
+    searchPlaceholder: "କ୍ରମ ସଂଖ୍ୟା, ଠିକଣା, ପ୍ରତିଷ୍ଠାନ କିମ୍ବା ଫୋନ୍ ଲେଖନ୍ତୁ",
     supportTitle: "ସମର୍ଥନ ସଙ୍କେତ",
     supportLead: "କିଛି ସମର୍ଥନ ଦିଅନ୍ତୁ।",
     resultFound: "ସ୍ଥାନୀୟ ମେମ୍ବର ତାଲିକାରେ ମିଳିଲା",
@@ -348,6 +363,11 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     notEligible: "ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ମ୍ୟାଚ୍ ନାହିଁ",
     startTyping: "ସଦସ୍ୟ ବିବରଣୀ ଟାଇପ୍ କରି ଆରମ୍ଭ କରନ୍ତୁ",
     searchRuns: "ଏହି ଖୋଜ ସ୍ଥାନୀୟ ସଦସ୍ୟ ତଥ୍ୟ ଉପରେ ତୁରନ୍ତ ଚାଲେ।",
+    slotTitle: "ଆଗମନ ସ୍ଲଟ୍ ଯୋଜନା",
+    slotLead: "ନିର୍ବାଚନ ସମୟ 9:00 AM ଠାରୁ 3:00 PM ପର୍ଯ୍ୟନ୍ତ। ଗୋଟିଏ 15-ମିନିଟ୍ ସ୍ଲଟ୍ ବାଛନ୍ତୁ।",
+    slotPeople: "ଜଣ",
+    slotSelectOne: "ଗୋଟିଏ ସ୍ଲଟ୍ ବାଛନ୍ତୁ। ସେହି ସ୍ଲଟ୍‌କୁ ପୁନି କ୍ଲିକ୍ କଲେ ଅନଲକ୍ ହେବ ଏବଂ ଅନ୍ୟ ସ୍ଲଟ୍ ବାଛିପାରିବେ।",
+    slotSelectedPrefix: "ବାଛାଯାଇଥିବା ସ୍ଲଟ୍:",
     matchFound: "ମ୍ୟାଚ୍ ମିଳିଲା",
     noMatch: "ମ୍ୟାଚ୍ ନାହିଁ",
     matchesLabel: "ମ୍ୟାଚ୍",
@@ -382,7 +402,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
   },
   te: {
     nav: ["హోమ్", "ప్రొఫైల్", "అర్హత", "సపోర్ట్", "కాంటాక్ట్"],
-    modeLabels: { all: "అన్నీ", phone: "ఫోన్", name: "పేరు", business: "వ్యాపారం", address: "చిరునామా" },
+    modeLabels: { all: "అన్నీ", phone: "ఫోన్", name: "క్రమ సంఖ్య", business: "సంస్థ", address: "చిరునామా" },
     heroEyebrow: "JCCI ఎన్నికలు 2026-27",
     heroTitle: "Director కి ఓటు వేయండి",
     heroLead:
@@ -433,7 +453,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     searchTitle: "అర్హత తనిఖీ",
     searchLead: "మీరు అర్హులా కాదా చూసుకోండి.",
     eligibilitySearchLabel: "వెతుకు",
-    searchPlaceholder: "ఫోన్, పేరు, వ్యాపారం లేదా చిరునామా నమోదు చేయండి",
+    searchPlaceholder: "క్రమ సంఖ్య, చిరునామా, సంస్థ లేదా ఫోన్ నమోదు చేయండి",
     supportTitle: "సపోర్ట్ సిగ్నల్",
     supportLead: "కొంత మద్దతు చూపించండి.",
     resultFound: "స్థానిక సభ్యుల జాబితాలో దొరికింది",
@@ -442,6 +462,11 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     notEligible: "ఇంకా మ్యాచ్ లేదు",
     startTyping: "ఒక సభ్యుడి వివరాలు టైప్ చేసి ప్రారంభించండి",
     searchRuns: "ఈ సెర్చ్ స్థానిక సభ్యుల డేటాపై వెంటనే పనిచేస్తుంది.",
+    slotTitle: "వచ్చే సమయ స్లాట్ ప్లానర్",
+    slotLead: "ఎన్నిక సమయం 9:00 AM నుంచి 3:00 PM వరకు. ఒక 15-నిమిషాల స్లాట్ ఎంచుకోండి.",
+    slotPeople: "మంది",
+    slotSelectOne: "ఒక స్లాట్ ఎంచుకోండి. అదే స్లాట్‌పై మళ్లీ క్లిక్ చేస్తే అన్‌లాక్ అవుతుంది, తర్వాత మరొక స్లాట్ ఎంచుకోవచ్చు.",
+    slotSelectedPrefix: "ఎంచుకున్న స్లాట్:",
     matchFound: "మ్యాచ్ దొరికింది",
     noMatch: "మ్యాచ్ లేదు",
     matchesLabel: "మ్యాచ్‌లు",
@@ -485,8 +510,51 @@ const languageOptions: Array<{ key: LanguageKey; label: string }> = [
 
 const modes: SearchMode[] = ["all", "phone", "name", "business", "address"];
 
+type SlotItem = {
+  key: string;
+  label: string;
+};
+
 function normalizePhone(value: string) {
   return value.replace(/\D/g, "");
+}
+
+function toProperCase(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/\b[a-z]/g, (char) => char.toUpperCase());
+}
+
+function formatSlotPart(hour24: number, minute: number) {
+  const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+  const period = hour24 < 12 ? "AM" : "PM";
+  return `${hour12.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")} ${period}`;
+}
+
+function buildElectionSlots() {
+  const slots: SlotItem[] = [];
+  const startMinutes = 9 * 60;
+  const endMinutes = 15 * 60;
+
+  for (let current = startMinutes; current < endMinutes; current += 15) {
+    const next = current + 15;
+    const startHour = Math.floor(current / 60);
+    const startMinute = current % 60;
+    const endHour = Math.floor(next / 60);
+    const endMinute = next % 60;
+    const key = `${startHour.toString().padStart(2, "0")}:${startMinute
+      .toString()
+      .padStart(2, "0")}-${endHour.toString().padStart(2, "0")}:${endMinute
+      .toString()
+      .padStart(2, "0")}`;
+
+    slots.push({
+      key,
+      label: `${formatSlotPart(startHour, startMinute)} - ${formatSlotPart(endHour, endMinute)}`,
+    });
+  }
+
+  return slots;
 }
 
 function escapeRegex(value: string) {
@@ -521,10 +589,15 @@ export function CampaignSite({
   memberRecords,
 }: Props) {
   const supportFlagKey = "kishore-support-locked";
+  const slotSelectionKey = "kishore-selected-slot";
+  const slotOptions = useMemo(() => buildElectionSlots(), []);
   const [language, setLanguage] = useState<LanguageKey>("en");
   const [searchMode, setSearchMode] = useState<SearchMode>("all");
   const [query, setQuery] = useState("");
   const [supportCount, setSupportCount] = useState(121);
+  const [slotCounts, setSlotCounts] = useState<Record<string, number>>({});
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [slotLoading, setSlotLoading] = useState(false);
   const [hasSupported, setHasSupported] = useState(false);
   const [supportLoading, setSupportLoading] = useState(false);
   const [submissionName, setSubmissionName] = useState("");
@@ -534,28 +607,87 @@ export function CampaignSite({
   const [submissionNote, setSubmissionNote] = useState("");
   const [isMissingModalOpen, setIsMissingModalOpen] = useState(false);
 
+  const loadSupportCount = useCallback(async () => {
+    try {
+      const response = await fetch("/api/support", { cache: "no-store" });
+      if (!response.ok) {
+        return;
+      }
+
+      const payload = (await response.json()) as { count?: number };
+      if (typeof payload.count === "number") {
+        setSupportCount(payload.count);
+      }
+    } catch {
+      // Keep current count when the API is temporarily unavailable.
+    }
+  }, []);
+
+  const loadSlotCounts = useCallback(async () => {
+    try {
+      const response = await fetch("/api/slots", { cache: "no-store" });
+      if (!response.ok) {
+        return;
+      }
+
+      const payload = (await response.json()) as { counts?: Record<string, number> };
+      if (payload.counts && typeof payload.counts === "object") {
+        setSlotCounts(payload.counts);
+      }
+    } catch {
+      // Keep current slot counts when API is unavailable.
+    }
+  }, []);
+
   useEffect(() => {
-    const isLocked = window.localStorage.getItem(supportFlagKey) === "1";
-    setHasSupported(isLocked);
+    function syncLocalState() {
+      const isLocked = window.localStorage.getItem(supportFlagKey) === "1";
+      const storedSlot = window.localStorage.getItem(slotSelectionKey);
+      setHasSupported(isLocked);
+      setSelectedSlot(storedSlot || null);
+    }
 
-    async function loadSupportCount() {
-      try {
-        const response = await fetch("/api/support", { cache: "no-store" });
-        if (!response.ok) {
-          return;
-        }
+    function refreshFromServer() {
+      void loadSupportCount();
+      void loadSlotCounts();
+    }
 
-        const payload = (await response.json()) as { count?: number };
-        if (typeof payload.count === "number") {
-          setSupportCount(payload.count);
-        }
-      } catch {
-        // Keep zero when the API is temporarily unavailable.
+    function onVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        refreshFromServer();
       }
     }
 
-    void loadSupportCount();
-  }, []);
+    function onWindowFocus() {
+      refreshFromServer();
+    }
+
+    function onPageShow() {
+      syncLocalState();
+      refreshFromServer();
+    }
+
+    function onStorageChange(event: StorageEvent) {
+      if (event.key === supportFlagKey || event.key === slotSelectionKey) {
+        syncLocalState();
+      }
+    }
+
+    syncLocalState();
+    refreshFromServer();
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("focus", onWindowFocus);
+    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("storage", onStorageChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("focus", onWindowFocus);
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("storage", onStorageChange);
+    };
+  }, [loadSlotCounts, loadSupportCount]);
 
   const results = useMemo(() => searchMembers(memberRecords, query, searchMode), [
     memberRecords,
@@ -577,6 +709,8 @@ export function CampaignSite({
     `mailto:${candidate.email}?subject=${encodeURIComponent(
       "JCCI member detail submission",
     )}&body=${encodeURIComponent(supportMessage.trim())}`;
+  const selectedSlotLabel =
+    slotOptions.find((slot) => slot.key === selectedSlot)?.label ?? "";
 
   async function incrementSupport() {
     if (hasSupported || supportLoading) {
@@ -602,10 +736,56 @@ export function CampaignSite({
         setSupportCount(payload.count);
       }
 
+      await loadSupportCount();
+
       setHasSupported(true);
       window.localStorage.setItem(supportFlagKey, "1");
     } finally {
       setSupportLoading(false);
+    }
+  }
+
+  async function updateSlotSelection(clickedSlot: string) {
+    if (slotLoading) {
+      return;
+    }
+
+    if (selectedSlot && selectedSlot !== clickedSlot) {
+      return;
+    }
+
+    const nextSlot = selectedSlot === clickedSlot ? null : clickedSlot;
+    setSlotLoading(true);
+
+    try {
+      const response = await fetch("/api/slots", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          previousSlot: selectedSlot,
+          nextSlot,
+        }),
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const payload = (await response.json()) as { counts?: Record<string, number> };
+      if (payload.counts && typeof payload.counts === "object") {
+        setSlotCounts(payload.counts);
+      }
+
+      setSelectedSlot(nextSlot);
+      if (nextSlot) {
+        window.localStorage.setItem(slotSelectionKey, nextSlot);
+      } else {
+        window.localStorage.removeItem(slotSelectionKey);
+      }
+    } finally {
+      setSlotLoading(false);
     }
   }
 
@@ -877,10 +1057,12 @@ export function CampaignSite({
               <div className={styles.resultsList}>
                 {results.slice(0, 12).map((record) => (
                   <article className={styles.resultCard} key={`${record.name}-${record.phone}-${record.address}`}>
-                    <h4>{record.name}</h4>
-                    <p>{record.address || activeCopy.addressUnavailable}</p>
-                    <span>{record.phone || activeCopy.phoneUnavailable}</span>
-                    <small>{record.business}</small>
+                    <div className={styles.resultSerial}>{record.slNo || "-"}</div>
+                    <div className={styles.resultCardBody}>
+                      <h4>{toProperCase(record.name)}</h4>
+                      <p>{record.address ? toProperCase(record.address) : activeCopy.addressUnavailable}</p>
+                      <span>{record.phone || activeCopy.phoneUnavailable}</span>
+                    </div>
                   </article>
                 ))}
               </div>
@@ -894,6 +1076,46 @@ export function CampaignSite({
               >
                 {activeCopy.submissionCta}
               </button>
+            </div>
+          </div>
+
+          <div className={styles.slotSection}>
+            <div className={styles.sectionHeader}>
+              <p className={styles.sectionKicker}>{activeCopy.slotTitle}</p>
+              <h2 className={styles.slotHeading}>
+                <span className={`${styles.slotHeadingLine} ${styles.slotHeadingPrimary}`}>
+                  Election timing is <span className={styles.slotTimeBlue}>9:00 AM to 3:00 PM</span>.
+                </span>
+                <span className={`${styles.slotHeadingLine} ${styles.slotHeadingSecondary}`}>Pick one arrival slot.</span>
+              </h2>
+            </div>
+
+            <div className={styles.slotPlanner}>
+              <div className={styles.slotGrid}>
+                {slotOptions.map((slot) => {
+                  const isActive = selectedSlot === slot.key;
+                  const isBlocked = Boolean(selectedSlot) && !isActive;
+                  const slotCount = slotCounts[slot.key] ?? 0;
+                  return (
+                    <button
+                      key={slot.key}
+                      type="button"
+                      className={isActive ? styles.slotButtonActive : styles.slotButton}
+                      disabled={slotLoading || isBlocked}
+                      onClick={() => updateSlotSelection(slot.key)}
+                    >
+                      <span>{slot.label}</span>
+                      <strong>{slotCount} {slotCount === 1 ? "member" : "members"}</strong>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <p className={styles.slotHint}>
+                {selectedSlot && selectedSlotLabel
+                  ? `${activeCopy.slotSelectedPrefix} ${selectedSlotLabel}`
+                  : activeCopy.slotSelectOne}
+              </p>
             </div>
           </div>
         </section>

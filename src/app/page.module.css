@@ -856,6 +856,31 @@
   white-space: nowrap;
 }
 
+.slotHeading {
+  max-width: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.06;
+  font-size: clamp(1.65rem, 2.6vw, 2.25rem);
+}
+
+.slotHeadingLine {
+  display: block;
+}
+
+.slotHeadingPrimary {
+  white-space: nowrap;
+}
+
+.slotHeadingSecondary {
+  margin-top: 4px;
+}
+
+.slotTimeBlue {
+  color: #2563eb;
+}
+
 .profileGrid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -1017,6 +1042,80 @@
   gap: 18px;
 }
 
+.slotPlanner {
+  display: grid;
+  gap: 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow);
+  padding: 14px;
+}
+
+.slotSection {
+  margin-top: 22px;
+}
+
+.slotGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.slotButton,
+.slotButtonActive {
+  border-radius: 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.88), rgba(248, 250, 252, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  color: #0f172a;
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.slotButton:hover:not(:disabled),
+.slotButtonActive:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px rgba(29, 78, 216, 0.12);
+}
+
+.slotButton span,
+.slotButtonActive span {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.slotButton strong,
+.slotButtonActive strong {
+  font-size: 0.84rem;
+  color: #475569;
+}
+
+.slotButtonActive {
+  border-color: rgba(29, 78, 216, 0.64);
+  background: linear-gradient(180deg, rgba(219, 234, 254, 0.95), rgba(239, 246, 255, 1));
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.14);
+}
+
+.slotButton:disabled,
+.slotButtonActive:disabled {
+  cursor: not-allowed;
+}
+
+.slotButton:disabled {
+  opacity: 0.45;
+}
+
+.slotHint {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
 .missingCtaWrap {
   display: flex;
   justify-content: flex-end;
@@ -1120,11 +1219,41 @@
 }
 
 .resultCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 14px;
   border-radius: 20px;
   padding: 18px;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 16px 32px rgba(15, 23, 42, 0.06);
   animation: cardRise 0.45s ease both;
+}
+
+.resultSerial {
+  min-width: 44px;
+  display: block;
+  align-self: center;
+  line-height: 1;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #1d4ed8;
+}
+
+.resultCardBody {
+  min-width: 0;
+}
+
+.resultCardBody h4,
+.resultCardBody p,
+.resultCardBody span {
+  margin: 0;
+}
+
+.resultCardBody p,
+.resultCardBody span {
+  margin-top: 8px;
 }
 
 .resultCard span,

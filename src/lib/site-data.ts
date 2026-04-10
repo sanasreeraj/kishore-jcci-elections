@@ -1,9 +1,7 @@
-import fs from "node:fs";
-import path from "node:path";
-
-import Papa from "papaparse";
+import { hasSupabaseConfig, supabaseServer } from "./supabase-server";
 
 export type MemberRecord = {
+  slNo: string;
   name: string;
   business: string;
   phone: string;
@@ -196,53 +194,111 @@ function normalizePhone(value: string) {
   return value.replace(/\D/g, "");
 }
 
-function getDataFilePath() {
-  const candidates = [
-    path.resolve(
-      process.cwd(),
-      "..",
-      "Data",
-      "JCCI - Members List FY 2026-2027  - Master Sheet.csv",
-    ),
-    path.resolve(
-      process.cwd(),
-      "public",
-      "data",
-      "members.csv",
-    ),
-  ];
+function toMemberRecord(row: {
+  slNo?: string | null;
+  sl_no?: string | null;
+  address?: string | null;
+  business?: string | null;
+  establishment?: string | null;
+  phone?: string | null;
+  cell_no?: string | null;
+}): MemberRecord {
+  const slNo = (row.slNo ?? row.sl_no ?? "").trim();
+  const address = (row.address ?? "").trim();
+  const business = (row.business ?? row.establishment ?? "").trim();
+  const phone = (row.phone ?? row.cell_no ?? "").trim();
+  const searchKey = normalizeText([slNo, address, business, phone].join(" "));
 
-  return candidates.find((candidatePath) => fs.existsSync(candidatePath));
+  return {
+    slNo,
+    name: business,
+    business,
+    phone,
+    address,
+    searchKey,
+  };
 }
 
-export function loadMemberRecords(): MemberRecord[] {
-  const csvPath = getDataFilePath();
-
-  if (!csvPath) {
+export async function loadMemberRecordsFromSupabase(): Promise<MemberRecord[]> {
+  if (!hasSupabaseConfig || !supabaseServer) {
     return [];
   }
 
-  const csvText = fs.readFileSync(csvPath, "utf8");
-  const parsed = Papa.parse<Record<string, string>>(csvText, {
-    header: true,
-    skipEmptyLines: true,
-    transformHeader: (header) => header.trim(),
+  const { data, error } = await supabaseServer
+    .from("member_records")
+    .select("sl_no,address,establishment,cell_no")
+    .order("sl_no", { ascending: true });
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data.map((row) =>
+    toMemberRecord({
+      sl_no: row.sl_no,
+      address: row.address,
+      establishment: row.establishment,
+      cell_no: row.cell_no,
+    }),
+  );
+}
+
+export async function loadMemberRecords(): Promise<MemberRecord[]> {
+  return await loadMemberRecordsFromSupabase();
+}
+
+export async function upsertMemberRecordInSupabase(input: {
+  slNo: string;
+  address: string;
+  establishment: string;
+  cellNo: string;
+}) {
+  if (!hasSupabaseConfig || !supabaseServer) {
+    return {
+      slNo: input.slNo,
+      address: input.address,
+      establishment: input.establishment,
+      cellNo: input.cellNo,
+    };
+  }
+
+  const searchKey = normalizeText([input.slNo, input.address, input.establishment, input.cellNo].join(" "));
+
+  const { data, error } = await supabaseServer
+    .from("member_records")
+    .upsert(
+      {
+        sl_no: input.slNo,
+        address: input.address,
+        establishment: input.establishment,
+        cell_no: input.cellNo,
+        search_key: searchKey,
+      },
+      { onConflict: "sl_no" },
+    )
+    .select("sl_no,address,establishment,cell_no")
+    .single();
+
+  if (error || !data) {
+    throw new Error(error?.message ?? "Unable to save member record");
+  }
+
+  return toMemberRecord({
+    sl_no: data.sl_no,
+    address: data.address,
+    establishment: data.establishment,
+    cell_no: data.cell_no,
   });
+}
 
-  return parsed.data
-    .map((row) => {
-      const address = (row.Address ?? "").trim();
-      const business = (row.Name ?? "").trim();
-      const phone = (row["Phone Number"] ?? "").trim();
-      const searchKey = normalizeText([address, business, phone].join(" "));
+export async function deleteMemberRecordInSupabase(slNo: string) {
+  if (!hasSupabaseConfig || !supabaseServer || !slNo) {
+    return;
+  }
 
-      return {
-        name: business,
-        business,
-        phone,
-        address,
-        searchKey,
-      } satisfies MemberRecord;
-    })
-    .filter((record) => record.name || record.business || record.phone || record.address);
+  const { error } = await supabaseServer.from("member_records").delete().eq("sl_no", slNo);
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
