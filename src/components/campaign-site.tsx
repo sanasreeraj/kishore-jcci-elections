@@ -891,8 +891,8 @@ export function CampaignSite({
           <div className={styles.heroVisual}>
             <div className={styles.heroFrame}>
               <Image
-                src="/assets/kishore-standing.png"
-                alt="Ch Kishore Kumar standing portrait"
+                src="/assets/kishore.png"
+                alt="Ch Kishore Kumar portrait"
                 fill
                 className={styles.heroImage}
                 priority
