@@ -1,7 +1,7 @@
 .shell {
   width: min(1240px, calc(100% - 24px));
   margin: 0 auto;
-  padding: 14px 0 48px;
+  padding: 14px 0 32px;
 }
 
 .topbar {
@@ -69,12 +69,14 @@
   justify-content: center;
   flex: 1 1 260px;
   flex-wrap: wrap;
-  gap: 6px 12px;
+  gap: 6px 10px;
   color: var(--muted);
   font-size: 0.9rem;
 }
 
 .nav a {
+  white-space: nowrap;
+  padding: 2px 4px;
   transition: color 0.18s ease, transform 0.18s ease;
 }
 
@@ -203,6 +205,24 @@
   padding: 16px 18px;
 }
 
+.heroBallotTile {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100%;
+  padding: 14px 18px;
+  overflow: hidden;
+}
+
+.heroBallotCard {
+  display: block;
+  align-self: center;
+  justify-self: center;
+  margin-top: 0;
+  font-size: clamp(7rem, 12vw, 10.5rem) !important;
+  line-height: 0.76;
+  letter-spacing: -0.1em;
+}
+
 .heroStats strong,
 .resultCard h4,
 .supporterCard h3,
@@ -219,6 +239,10 @@
 .heroStats strong {
   display: block;
   font-size: 1.03rem;
+}
+
+.heroStats .heroBallotCard {
+  font-weight: 600;
 }
 
 .heroStats span {
@@ -245,9 +269,6 @@
 
 .ballotNumberBig {
   color: var(--accent);
-  font-size: clamp(2rem, 4vw, 2.8rem) !important;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
 }
 
 .mapsButton {
@@ -451,6 +472,52 @@
   margin-top: 42px;
 }
 
+.pageFooter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 10px 8px 0;
+  color: #94a3b8;
+}
+
+.pageFooterText {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  color: #94a3b8;
+}
+
+.pageFooterLinks {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pageFooterLinks a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.08);
+  transition: color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.pageFooterLinks a:hover {
+  color: #64748b;
+  background: rgba(148, 163, 184, 0.16);
+  transform: translateY(-1px);
+}
+
+.pageFooterLinks svg {
+  width: 14px;
+  height: 14px;
+}
+
 .sectionHeader {
   display: grid;
   gap: 6px;
@@ -533,13 +600,27 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .heroBallotCard {
+    font-size: clamp(6.5rem, 30vw, 9rem) !important;
+  }
+
+  .heroBallotTile {
+    padding: 12px 16px 10px;
+  }
+
   .section {
     margin-top: 36px;
   }
 
+  .pageFooter {
+    margin-top: 14px;
+    padding-top: 6px;
+  }
+
   .sectionHeader h2 {
     max-width: none;
-    font-size: clamp(1.8rem, 4.8vw, 2.5rem);
+    font-size: clamp(1.2rem, 8vw, 1.7rem);
+    line-height: 1.08;
   }
 
   .profileGrid,
@@ -595,9 +676,10 @@
   }
 
   .nav {
-    gap: 6px 8px;
+    gap: 6px 6px;
     flex: 0 0 auto;
     width: 100%;
+    font-size: 0.84rem;
   }
 
   .hero,
@@ -628,8 +710,9 @@
   }
 
   .heroContent h1 {
-    font-size: clamp(2.2rem, 12vw, 3.5rem);
+    font-size: clamp(2.05rem, 11vw, 3.2rem);
     line-height: 0.96;
+    font-weight: 650;
   }
 
   .heroVisual {
@@ -801,6 +884,19 @@
 
   .heroContent h1 {
     font-size: clamp(2rem, 12.5vw, 3.1rem);
+  }
+
+  .slotHeading {
+    font-size: clamp(1.2rem, 8vw, 1.7rem);
+    line-height: 1.08;
+  }
+
+  .slotHeadingPrimary {
+    white-space: normal;
+  }
+
+  .slotHeadingSecondary {
+    margin-top: 2px;
   }
 
   .heroLead,
@@ -1596,6 +1692,7 @@
   .shell {
     width: min(100% - 18px, 100%);
     padding-top: 12px;
+    padding-bottom: 20px;
   }
 
   .topbar {
@@ -1662,12 +1759,21 @@
   }
 
   .heroContent h1 {
-    font-size: clamp(2.5rem, 15vw, 4rem);
+    font-size: clamp(1.9rem, 11vw, 2.85rem);
+    font-weight: 650;
   }
 
   .sectionHeader h2 {
     max-width: none;
-    font-size: clamp(1.8rem, 9vw, 2.4rem);
+    font-size: clamp(1.2rem, 8vw, 1.7rem);
+    line-height: 1.08;
+  }
+
+  .pageFooter {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    margin-top: 10px;
   }
 
   .eligibilityHeading {

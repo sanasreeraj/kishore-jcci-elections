@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BiEnvelope, BiNavigation, BiPhoneCall } from "react-icons/bi";
+import { FaGithub, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
 import { FaWhatsapp } from "react-icons/fa6";
 
 import type { CandidateProfile, ElectionInfo, MemberRecord, Supporter } from "@/lib/site-data";
@@ -98,11 +99,14 @@ type CampaignCopy = {
   contactEmail: string;
   contactWhatsapp: string;
   contactWhatsappCta: string;
+  slotHeadingLine1: string;
+  slotHeadingLine2: string;
+  footerCredit: string;
 };
 
 const copy: Record<LanguageKey, CampaignCopy> = {
   en: {
-    nav: ["Home", "Profile", "Eligibility", "Support", "Contact"],
+    nav: ["Home", "Profile", "Eligibility", "Book Slot", "Support", "Contact"],
     modeLabels: { all: "All", phone: "Phone", name: "Sl No", business: "Establishment", address: "Address" },
     heroEyebrow: "JCCI Election 2026-27",
     heroTitle: "Vote for Director",
@@ -165,6 +169,8 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     startTyping: "Start by typing a member detail",
     searchRuns: "The search runs instantly on the local member dataset.",
     slotTitle: "Arrival Slot Planner",
+    slotHeadingLine1: "Election timing is",
+    slotHeadingLine2: "Pick one arrival slot.",
     slotLead: "Election timing is 9:00 AM to 3:00 PM. Pick one 15-minute arrival slot.",
     slotPeople: "people",
     slotSelectOne: "Select one slot. Tap the same selected slot to unlock and choose a different one.",
@@ -201,9 +207,10 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     contactEmail: "Email",
     contactWhatsapp: "WhatsApp",
     contactWhatsappCta: "Open direct chat with Kishore",
+    footerCredit: "Developed by Sana Sreeraj",
   },
   hi: {
-    nav: ["होम", "प्रोफाइल", "पात्रता", "समर्थन", "संपर्क"],
+    nav: ["होम", "प्रोफाइल", "पात्रता", "स्लॉट देखें", "समर्थन", "संपर्क"],
     modeLabels: { all: "सभी", phone: "फोन", name: "क्रम संख्या", business: "प्रतिष्ठान", address: "पता" },
     heroEyebrow: "JCCI चुनाव 2026-27",
     heroTitle: "Director के लिए वोट दें",
@@ -265,6 +272,8 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     startTyping: "किसी सदस्य का विवरण टाइप करके शुरू करें",
     searchRuns: "यह खोज स्थानीय सदस्य डेटा पर तुरंत चलती है।",
     slotTitle: "आगमन स्लॉट योजना",
+    slotHeadingLine1: "चुनाव का समय है",
+    slotHeadingLine2: "एक आगमन स्लॉट चुनें।",
     slotLead: "चुनाव समय 9:00 AM से 3:00 PM है। एक 15-मिनट का स्लॉट चुनें।",
     slotPeople: "लोग",
     slotSelectOne: "एक स्लॉट चुनें। उसी चुने हुए स्लॉट पर फिर क्लिक करने से अनलॉक होगा और आप दूसरा स्लॉट चुन सकेंगे।",
@@ -300,9 +309,10 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     contactEmail: "ईमेल",
     contactWhatsapp: "व्हाट्सऐप",
     contactWhatsappCta: "किशोर से सीधे चैट खोलें",
+    footerCredit: "सना श्रीराज द्वारा विकसित",
   },
   or: {
-    nav: ["ମୁଖ୍ୟ", "ପ୍ରୋଫାଇଲ୍", "ଯୋଗ୍ୟତା", "ସମର୍ଥନ", "ଯୋଗାଯୋଗ"],
+    nav: ["ମୁଖ୍ୟ", "ପ୍ରୋଫାଇଲ୍", "ଯୋଗ୍ୟତା", "ସ୍ଲଟ୍ ଦେଖନ୍ତୁ", "ସମର୍ଥନ", "ଯୋଗାଯୋଗ"],
     modeLabels: { all: "ସବୁ", phone: "ଫୋନ୍", name: "କ୍ରମ ସଂଖ୍ୟା", business: "ପ୍ରତିଷ୍ଠାନ", address: "ଠିକଣା" },
     heroEyebrow: "JCCI ନିର୍ବାଚନ 2026-27",
     heroTitle: "Director ପାଇଁ ଭୋଟ ଦିଅନ୍ତୁ",
@@ -364,6 +374,8 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     startTyping: "ସଦସ୍ୟ ବିବରଣୀ ଟାଇପ୍ କରି ଆରମ୍ଭ କରନ୍ତୁ",
     searchRuns: "ଏହି ଖୋଜ ସ୍ଥାନୀୟ ସଦସ୍ୟ ତଥ୍ୟ ଉପରେ ତୁରନ୍ତ ଚାଲେ।",
     slotTitle: "ଆଗମନ ସ୍ଲଟ୍ ଯୋଜନା",
+    slotHeadingLine1: "ନିର୍ବାଚନ ସମୟ ହେଉଛି",
+    slotHeadingLine2: "ଗୋଟିଏ ଆଗମନ ସ୍ଲଟ୍ ବାଛନ୍ତୁ।",
     slotLead: "ନିର୍ବାଚନ ସମୟ 9:00 AM ଠାରୁ 3:00 PM ପର୍ଯ୍ୟନ୍ତ। ଗୋଟିଏ 15-ମିନିଟ୍ ସ୍ଲଟ୍ ବାଛନ୍ତୁ।",
     slotPeople: "ଜଣ",
     slotSelectOne: "ଗୋଟିଏ ସ୍ଲଟ୍ ବାଛନ୍ତୁ। ସେହି ସ୍ଲଟ୍‌କୁ ପୁନି କ୍ଲିକ୍ କଲେ ଅନଲକ୍ ହେବ ଏବଂ ଅନ୍ୟ ସ୍ଲଟ୍ ବାଛିପାରିବେ।",
@@ -399,9 +411,10 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     contactEmail: "ଇମେଲ୍",
     contactWhatsapp: "WhatsApp",
     contactWhatsappCta: "କିଶୋରଙ୍କ ସହ ସିଧା ଚାଟ୍ ଖୋଲନ୍ତୁ",
+    footerCredit: "ସନା ଶ୍ରୀରେଜଙ୍କ ଦ୍ୱାରା ତିଆରି",
   },
   te: {
-    nav: ["హోమ్", "ప్రొఫైల్", "అర్హత", "సపోర్ట్", "కాంటాక్ట్"],
+    nav: ["హోమ్", "ప్రొఫైల్", "అర్హత", "స్లాట్ చూడండి", "సపోర్ట్", "కాంటాక్ట్"],
     modeLabels: { all: "అన్నీ", phone: "ఫోన్", name: "క్రమ సంఖ్య", business: "సంస్థ", address: "చిరునామా" },
     heroEyebrow: "JCCI ఎన్నికలు 2026-27",
     heroTitle: "Director కి ఓటు వేయండి",
@@ -463,6 +476,8 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     startTyping: "ఒక సభ్యుడి వివరాలు టైప్ చేసి ప్రారంభించండి",
     searchRuns: "ఈ సెర్చ్ స్థానిక సభ్యుల డేటాపై వెంటనే పనిచేస్తుంది.",
     slotTitle: "వచ్చే సమయ స్లాట్ ప్లానర్",
+    slotHeadingLine1: "ఎన్నికల సమయం ఉంటుంది",
+    slotHeadingLine2: "ఒక వచ్చే సమయ స్లాట్ ఎంచుకోండి.",
     slotLead: "ఎన్నిక సమయం 9:00 AM నుంచి 3:00 PM వరకు. ఒక 15-నిమిషాల స్లాట్ ఎంచుకోండి.",
     slotPeople: "మంది",
     slotSelectOne: "ఒక స్లాట్ ఎంచుకోండి. అదే స్లాట్‌పై మళ్లీ క్లిక్ చేస్తే అన్‌లాక్ అవుతుంది, తర్వాత మరొక స్లాట్ ఎంచుకోవచ్చు.",
@@ -498,11 +513,12 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     contactEmail: "ఇమెయిల్",
     contactWhatsapp: "WhatsApp",
     contactWhatsappCta: "కిశోర్‌తో నేరుగా చాట్ తెరవండి",
+    footerCredit: "సనా శ్రీరాజ్ రూపొందించారు",
   },
 };
 
 const languageOptions: Array<{ key: LanguageKey; label: string }> = [
-  { key: "en", label: "EN" },
+  { key: "en", label: "English" },
   { key: "hi", label: "हिन्दी" },
   { key: "or", label: "ଓଡିଆ" },
   { key: "te", label: "తెలుగు" },
@@ -808,7 +824,7 @@ export function CampaignSite({
         </div>
         <nav className={styles.nav} aria-label="Section navigation">
           {activeCopy.nav.map((item, index) => (
-            <a key={item} href={["#home", "#profile", "#eligibility", "#support", "#contact"][index]}>
+            <a key={item} href={["#home", "#profile", "#eligibility", "#slots", "#support", "#contact"][index]}>
               {item}
             </a>
           ))}
@@ -835,12 +851,12 @@ export function CampaignSite({
             <p className={styles.heroLead}>{activeCopy.heroLead}</p>
             <div className={styles.heroStats}>
               <div>
-                <span className={styles.heroStatLabel}>{activeCopy.heroBallot}</span>
-                <strong className={styles.ballotNumberBig}>8</strong>
-              </div>
-              <div>
                 <span className={styles.heroStatLabel}>{activeCopy.heroDate}</span>
                 <strong className={styles.heroStatHighlight}>{election.date}</strong>
+              </div>
+              <div>
+                <span className={styles.heroStatLabel}>{activeCopy.heroTime}</span>
+                <strong className={styles.heroStatHighlight}>{election.time}</strong>
               </div>
               <div>
                 <span className={styles.heroStatLabel}>{activeCopy.heroVenue}</span>
@@ -857,9 +873,9 @@ export function CampaignSite({
                   <BiNavigation aria-hidden="true" className={styles.directionIcon} />
                 </a>
               </div>
-              <div>
-                <span className={styles.heroStatLabel}>{activeCopy.heroTime}</span>
-                <strong className={styles.heroStatHighlight}>{election.time}</strong>
+              <div className={styles.heroBallotTile}>
+                <span className={styles.heroStatLabel}>{activeCopy.heroBallot}</span>
+                <strong className={`${styles.ballotNumberBig} ${styles.heroBallotCard}`}>8</strong>
               </div>
             </div>
             <div className={styles.heroActions}>
@@ -1079,14 +1095,16 @@ export function CampaignSite({
             </div>
           </div>
 
-          <div className={styles.slotSection}>
+          <div className={styles.slotSection} id="slots">
             <div className={styles.sectionHeader}>
               <p className={styles.sectionKicker}>{activeCopy.slotTitle}</p>
               <h2 className={styles.slotHeading}>
                 <span className={`${styles.slotHeadingLine} ${styles.slotHeadingPrimary}`}>
-                  Election timing is <span className={styles.slotTimeBlue}>9:00 AM to 3:00 PM</span>.
+                  {activeCopy.slotHeadingLine1} <span className={styles.slotTimeBlue}>9:00 AM to 3:00 PM</span>.
                 </span>
-                <span className={`${styles.slotHeadingLine} ${styles.slotHeadingSecondary}`}>Pick one arrival slot.</span>
+                <span className={`${styles.slotHeadingLine} ${styles.slotHeadingSecondary}`}>
+                  {activeCopy.slotHeadingLine2}
+                </span>
               </h2>
             </div>
 
@@ -1105,7 +1123,7 @@ export function CampaignSite({
                       onClick={() => updateSlotSelection(slot.key)}
                     >
                       <span>{slot.label}</span>
-                      <strong>{slotCount} {slotCount === 1 ? "member" : "members"}</strong>
+                      <strong>{slotCount} {activeCopy.slotPeople}</strong>
                     </button>
                   );
                 })}
@@ -1253,6 +1271,21 @@ export function CampaignSite({
             </a>
           </div>
         </section>
+
+        <footer className={styles.pageFooter}>
+          <p className={styles.pageFooterText}>{activeCopy.footerCredit}</p>
+          <div className={styles.pageFooterLinks} aria-label="Developer social links">
+            <a href="https://github.com/sanasreeraj" target="_blank" rel="noreferrer" aria-label="GitHub profile">
+              <FaGithub aria-hidden="true" />
+            </a>
+            <a href="https://www.linkedin.com/in/sana-sreeraj/" target="_blank" rel="noreferrer" aria-label="LinkedIn profile">
+              <FaLinkedinIn aria-hidden="true" />
+            </a>
+            <a href="https://www.instagram.com/iamsanasreeraj/" target="_blank" rel="noreferrer" aria-label="Instagram profile">
+              <FaInstagram aria-hidden="true" />
+            </a>
+          </div>
+        </footer>
       </main>
     </div>
   );
