@@ -40,7 +40,7 @@ async function incrementVisitorCountWithCompareAndSwap() {
 
   await supabaseServer
     .from("support_counter")
-    .upsert({ key: VISITOR_ROW_KEY, count: 0 }, { onConflict: "key" });
+    .upsert({ key: VISITOR_ROW_KEY, count: 0 }, { onConflict: "key", ignoreDuplicates: true });
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
     if (attempt > 0) {

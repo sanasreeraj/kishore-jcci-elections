@@ -110,12 +110,12 @@ async function applySlotDeltaWithCompareAndSwap(previousSlot: string | null, nex
 
   await supabaseServer
     .from(SLOT_TABLE_NAME)
-    .upsert(touchedSlots.map((slot) => ({ slot_key: slot, count: 0 })), { onConflict: "slot_key" });
+    .upsert(touchedSlots.map((slot) => ({ slot_key: slot, count: 0 })), {
+      onConflict: "slot_key",
+      ignoreDuplicates: true,
+    });
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
-    if (attempt > 0) {
-      await new Promise((resolve) => setTimeout(resolve, Math.min(100 * Math.pow(1.5, attempt), 500)));
-    }
     if (attempt > 0) {
       await new Promise((resolve) => setTimeout(resolve, Math.min(100 * Math.pow(1.5, attempt), 500)));
     }

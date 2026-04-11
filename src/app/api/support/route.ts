@@ -69,12 +69,9 @@ async function incrementSupportCountWithCompareAndSwap() {
 
   await supabaseServer
     .from("support_counter")
-    .upsert({ key: SUPPORT_ROW_KEY, count: 0 }, { onConflict: "key" });
+    .upsert({ key: SUPPORT_ROW_KEY, count: 0 }, { onConflict: "key", ignoreDuplicates: true });
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
-    if (attempt > 0) {
-      await new Promise((resolve) => setTimeout(resolve, Math.min(100 * Math.pow(1.5, attempt), 500)));
-    }
     if (attempt > 0) {
       await new Promise((resolve) => setTimeout(resolve, Math.min(100 * Math.pow(1.5, attempt), 500)));
     }
