@@ -195,8 +195,8 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     sideNoteText:
       "The form prepares a clean message for WhatsApp or email, so members can submit data without waiting for a login or custom server.",
     supportCount: "Support taps",
-    supportButton: "I Support Kishore Kumar",
-    supportButtonThanks: "Thank you for your support",
+    supportButton: "I like this website",
+    supportButtonThanks: "I liked this website",
     supportNote:
       "This is not official voting. It is only a support signal to understand your vote of confidence.",
     submit: "Send via WhatsApp",
@@ -810,8 +810,8 @@ export function CampaignSite({
       <header className={styles.topbar}>
         <div className={styles.brandLockup}>
           <Image
-            src="/assets/ballot-number.png"
-            alt="Ballot number 8"
+            src="/assets/jcci-logo.png"
+            alt="JCCI logo"
             width={76}
             height={76}
             className={styles.brandBadge}
@@ -1229,8 +1229,7 @@ export function CampaignSite({
             </button>
             <div>
               <p className={styles.cardLabel}>{activeCopy.supportCount}</p>
-              <h3>{supportCount}</h3>
-              <p>{activeCopy.supportNote}</p>
+              <h3 className={styles.supportCountValue}>{supportCount}</h3>
             </div>
           </div>
         </section>
