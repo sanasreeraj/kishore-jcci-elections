@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BiEnvelope, BiNavigation, BiPhoneCall } from "react-icons/bi";
-import { FaGithub, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
+import { FaFacebook, FaGithub, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
 import { FaWhatsapp } from "react-icons/fa6";
 
 import type { CandidateProfile, ElectionInfo, MemberRecord, Supporter } from "@/lib/site-data";
@@ -100,6 +100,8 @@ type CampaignCopy = {
   contactEmail: string;
   contactWhatsapp: string;
   contactWhatsappCta: string;
+  contactFacebook: string;
+  contactFacebookCta: string;
   slotHeadingLine1: string;
   slotHeadingLine2: string;
   footerCredit: string;
@@ -209,6 +211,8 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     contactEmail: "Email",
     contactWhatsapp: "WhatsApp",
     contactWhatsappCta: "Open direct chat with Kishore",
+    contactFacebook: "Facebook",
+    contactFacebookCta: "Follow on Facebook",
     footerCredit: "Developed by Sana Sreeraj",
   },
   hi: {
@@ -223,7 +227,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     heroVenue: "स्थान",
     heroTime: "समय",
     directionsTitle: "दिशाएं खोलें",
-    primary: "मेरा समर्थन करें",
+    primary: "अपना नाम मतदाता सूची में खोजें",
     secondary: "पात्रता जांचें",
     profileKicker: "मैं कौन हूं",
     profileTitle: "मुझे क्यों चुनें।",
@@ -262,7 +266,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     doneLabel: "पूरा",
     upcomingLabel: "आगामी",
     searchTitle: "पात्रता जांचें",
-    searchLead: "जांचें कि आप पात्र हैं या नहीं।",
+    searchLead: "अपना नाम मतदाता सूची में खोजें।",
     eligibilitySearchLabel: "खोज",
     searchPlaceholder: "क्रम संख्या, पता, प्रतिष्ठान या फोन दर्ज करें",
     supportTitle: "समर्थन संकेत",
@@ -312,6 +316,8 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     contactEmail: "ईमेल",
     contactWhatsapp: "व्हाट्सऐप",
     contactWhatsappCta: "किशोर से सीधे चैट खोलें",
+    contactFacebook: "फेसबुक",
+    contactFacebookCta: "फेसबुक पर फॉलो करें",
     footerCredit: "सना श्रीराज द्वारा विकसित",
   },
   or: {
@@ -326,7 +332,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     heroVenue: "ସ୍ଥାନ",
     heroTime: "ସମୟ",
     directionsTitle: "ଦିଗ ଖୋଲନ୍ତୁ",
-    primary: "ମୋତେ ସମର୍ଥନ କରନ୍ତୁ",
+    primary: "ମତଦାତା ତାଲିକାରେ ଆପଣଙ୍କର ନାମ ଖୋଜନ୍ତୁ",
     secondary: "ଯୋଗ୍ୟତା ଯାଞ୍ଚ",
     profileKicker: "ମୁଁ କିଏ",
     profileTitle: "ମୋତେ କାହିଁକି ଚୟନ କରିବେ।",
@@ -365,7 +371,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     doneLabel: "ସମ୍ପୂର୍ଣ୍ଣ",
     upcomingLabel: "ଆସନ୍ତା",
     searchTitle: "ଯୋଗ୍ୟତା ଯାଞ୍ଚ",
-    searchLead: "ଆପଣ ଯୋଗ୍ୟ କି ନାହିଁ ଯାଞ୍ଚ କରନ୍ତୁ।",
+    searchLead: "ମତଦାତା ତାଲିକାରେ ଆପଣଙ୍କର ନାମ ଖୋଜନ୍ତୁ।",
     eligibilitySearchLabel: "ଖୋଜନ୍ତୁ",
     searchPlaceholder: "କ୍ରମ ସଂଖ୍ୟା, ଠିକଣା, ପ୍ରତିଷ୍ଠାନ କିମ୍ବା ଫୋନ୍ ଲେଖନ୍ତୁ",
     supportTitle: "ସମର୍ଥନ ସଙ୍କେତ",
@@ -415,6 +421,8 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     contactEmail: "ଇମେଲ୍",
     contactWhatsapp: "WhatsApp",
     contactWhatsappCta: "କିଶୋରଙ୍କ ସହ ସିଧା ଚାଟ୍ ଖୋଲନ୍ତୁ",
+    contactFacebook: "ଫେସବୁକ",
+    contactFacebookCta: "ଫେସବୁକରେ ଫଲୋ କରନ୍ତୁ",
     footerCredit: "ସନା ଶ୍ରୀରେଜଙ୍କ ଦ୍ୱାରା ତିଆରି",
   },
   te: {
@@ -429,7 +437,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     heroVenue: "స్థలం",
     heroTime: "సమయం",
     directionsTitle: "దిశలు తెరవండి",
-    primary: "నన్ను సపోర్ట్ చేయండి",
+    primary: "ఓటర్ జాబితాలో మీ పేరు ఖోజండి",
     secondary: "అర్హత తనిఖీ",
     profileKicker: "నేను ఎవరు",
     profileTitle: "నన్నెందుకు ఎంచుకోవాలి.",
@@ -468,7 +476,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     doneLabel: "పూర్తి",
     upcomingLabel: "రాబోయే",
     searchTitle: "అర్హత తనిఖీ",
-    searchLead: "మీరు అర్హులా కాదా చూసుకోండి.",
+    searchLead: "ఓటర్ జాబితాలో మీ పేరు ఖోజండి.",
     eligibilitySearchLabel: "వెతుకు",
     searchPlaceholder: "క్రమ సంఖ్య, చిరునామా, సంస్థ లేదా ఫోన్ నమోదు చేయండి",
     supportTitle: "సపోర్ట్ సిగ్నల్",
@@ -518,6 +526,8 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     contactEmail: "ఇమెయిల్",
     contactWhatsapp: "WhatsApp",
     contactWhatsappCta: "కిశోర్‌తో నేరుగా చాట్ తెరవండి",
+    contactFacebook: "ఫేస్‌బుక్",
+    contactFacebookCta: "ఫేస్‌బుక్‌లో ఫాలో చేయండి",
     footerCredit: "సనా శ్రీరాజ్ రూపొందించారు",
   },
 };
@@ -1321,6 +1331,15 @@ export function CampaignSite({
                 <span className={styles.contactLabel}>{activeCopy.contactWhatsapp}</span>
               </div>
               <strong>{activeCopy.contactWhatsappCta}</strong>
+            </a>
+            <a className={styles.contactCard} href="https://www.facebook.com/share/1DotT8cg6w/" target="_blank" rel="noreferrer">
+              <div className={styles.contactCardHead}>
+                <span className={`${styles.contactIcon} ${styles.contactIconFacebook}`}>
+                  <FaFacebook aria-hidden="true" />
+                </span>
+                <span className={styles.contactLabel}>{activeCopy.contactFacebook}</span>
+              </div>
+              <strong>{activeCopy.contactFacebookCta}</strong>
             </a>
           </div>
         </section>

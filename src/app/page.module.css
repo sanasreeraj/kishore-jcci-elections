@@ -1535,6 +1535,12 @@
   border-color: rgba(22, 163, 74, 0.24);
 }
 
+.contactIconFacebook {
+  color: #1f2937;
+  background: rgba(229, 231, 235, 0.88);
+  border-color: rgba(31, 41, 55, 0.24);
+}
+
 .contactLabel {
   color: #64748b;
   font-size: 0.78rem;
