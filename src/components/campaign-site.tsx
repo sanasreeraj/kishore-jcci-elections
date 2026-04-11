@@ -610,7 +610,6 @@ export function CampaignSite({
   memberRecords,
 }: Props) {
   const supportFlagKey = "kishore-support-locked";
-  const visitorFlagKey = "kishore-visitor-counted";
   const slotSelectionKey = "kishore-selected-slot";
   const slotOptions = useMemo(() => buildElectionSlots(), []);
   const [language, setLanguage] = useState<LanguageKey>("en");
@@ -679,13 +678,6 @@ export function CampaignSite({
   }, []);
 
   const registerVisitor = useCallback(async () => {
-    const alreadyCounted = window.localStorage.getItem(visitorFlagKey) === "1";
-
-    if (alreadyCounted) {
-      await loadVisitorCount();
-      return;
-    }
-
     try {
       const response = await fetch("/api/visitors", {
         method: "POST",
@@ -694,18 +686,20 @@ export function CampaignSite({
         },
       });
 
-      if (response.ok) {
-        const payload = (await response.json()) as { count?: number };
-        if (typeof payload.count === "number") {
-          setVisitorCount(payload.count);
-        }
+      if (!response.ok) {
+        await loadVisitorCount();
+        return;
+      }
+
+      const payload = (await response.json()) as { count?: number };
+      if (typeof payload.count === "number") {
+        setVisitorCount(payload.count);
       }
     } catch {
       // Ignore temporary errors and continue rendering the page.
-    } finally {
-      window.localStorage.setItem(visitorFlagKey, "1");
+      await loadVisitorCount();
     }
-  }, [loadVisitorCount, visitorFlagKey]);
+  }, [loadVisitorCount]);
 
   useEffect(() => {
     function syncLocalState() {
