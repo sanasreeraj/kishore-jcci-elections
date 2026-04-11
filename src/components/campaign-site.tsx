@@ -107,7 +107,7 @@ type CampaignCopy = {
 
 const copy: Record<LanguageKey, CampaignCopy> = {
   en: {
-    nav: ["Home", "Profile", "Eligibility", "Book Slot", "Support", "Contact"],
+    nav: ["Home", "Profile", "Book Slot", "Contact"],
     modeLabels: { all: "All", phone: "Phone", name: "Sl No", business: "Establishment", address: "Address" },
     heroEyebrow: "JCCI Election 2026-27",
     heroTitle: "Vote for Director",
@@ -118,7 +118,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     heroVenue: "Venue",
     heroTime: "Time",
     directionsTitle: "Open directions",
-    primary: "Pick your slot",
+    primary: "Search your name in Voter list",
     secondary: "Check Eligibility",
     profileKicker: "Who Am I",
     profileTitle: "Why select me.",
@@ -212,7 +212,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     footerCredit: "Developed by Sana Sreeraj",
   },
   hi: {
-    nav: ["होम", "प्रोफाइल", "पात्रता", "स्लॉट देखें", "समर्थन", "संपर्क"],
+    nav: ["होम", "प्रोफाइल", "स्लॉट देखें", "संपर्क"],
     modeLabels: { all: "सभी", phone: "फोन", name: "क्रम संख्या", business: "प्रतिष्ठान", address: "पता" },
     heroEyebrow: "JCCI चुनाव 2026-27",
     heroTitle: "Director के लिए वोट दें",
@@ -315,7 +315,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     footerCredit: "सना श्रीराज द्वारा विकसित",
   },
   or: {
-    nav: ["ମୁଖ୍ୟ", "ପ୍ରୋଫାଇଲ୍", "ଯୋଗ୍ୟତା", "ସ୍ଲଟ୍ ଦେଖନ୍ତୁ", "ସମର୍ଥନ", "ଯୋଗାଯୋଗ"],
+    nav: ["ମୁଖ୍ୟ", "ପ୍ରୋଫାଇଲ୍", "ସ୍ଲଟ୍ ଦେଖନ୍ତୁ", "ଯୋଗାଯୋଗ"],
     modeLabels: { all: "ସବୁ", phone: "ଫୋନ୍", name: "କ୍ରମ ସଂଖ୍ୟା", business: "ପ୍ରତିଷ୍ଠାନ", address: "ଠିକଣା" },
     heroEyebrow: "JCCI ନିର୍ବାଚନ 2026-27",
     heroTitle: "Director ପାଇଁ ଭୋଟ ଦିଅନ୍ତୁ",
@@ -418,7 +418,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     footerCredit: "ସନା ଶ୍ରୀରେଜଙ୍କ ଦ୍ୱାରା ତିଆରି",
   },
   te: {
-    nav: ["హోమ్", "ప్రొఫైల్", "అర్హత", "స్లాట్ చూడండి", "సపోర్ట్", "కాంటాక్ట్"],
+    nav: ["హోమ్", "ప్రొఫైల్", "స్లాట్ చూడండి", "కాంటాక్ట్"],
     modeLabels: { all: "అన్నీ", phone: "ఫోన్", name: "క్రమ సంఖ్య", business: "సంస్థ", address: "చిరునామా" },
     heroEyebrow: "JCCI ఎన్నికలు 2026-27",
     heroTitle: "Director కి ఓటు వేయండి",
@@ -873,7 +873,7 @@ export function CampaignSite({
         </div>
         <nav className={styles.nav} aria-label="Section navigation">
           {activeCopy.nav.map((item, index) => (
-            <a key={item} href={["#home", "#profile", "#eligibility", "#slots", "#support", "#contact"][index]}>
+            <a key={item} href={["#home", "#profile", "#slots", "#contact"][index]}>
               {item}
             </a>
           ))}
@@ -928,11 +928,8 @@ export function CampaignSite({
               </div>
             </div>
             <div className={styles.heroActions}>
-              <a className={styles.primaryAction} href="#slots">
+              <a className={styles.primaryAction} href="#eligibility">
                 {activeCopy.primary}
-              </a>
-              <a className={styles.secondaryAction} href="#eligibility">
-                {activeCopy.secondary}
               </a>
             </div>
           </div>
