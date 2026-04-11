@@ -1461,10 +1461,29 @@
   pointer-events: none;
 }
 
+.supportStats {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+  text-align: right;
+}
+
+.supportStats .cardLabel {
+  color: #94a3b8;
+}
+
 .supportCountValue {
   margin: 4px 0 0;
   font-size: clamp(1.75rem, 3.1vw, 2.2rem);
   line-height: 1.05;
+}
+
+.supportCountBlue {
+  color: #2563eb;
+}
+
+.supportCountBlack {
+  color: #111827;
 }
 
 .contactCard {
@@ -1762,6 +1781,14 @@
   .resultBanner {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .supportStats {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-items: start;
+    text-align: left;
+    gap: 10px 16px;
   }
 
   .heroContent h1 {

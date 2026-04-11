@@ -83,6 +83,10 @@ on conflict (key) do update
 set count = excluded.count,
     updated_at = now();
 
+insert into public.support_counter (key, count)
+values ('visitor_count', 0)
+on conflict (key) do nothing;
+
 insert into public.slot_counts (slot_key, count)
 values
   ('09:00-09:15', 0),

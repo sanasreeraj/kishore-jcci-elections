@@ -88,6 +88,7 @@ type CampaignCopy = {
   supportTitle: string;
   supportLead: string;
   supportCount: string;
+  visitorCount: string;
   supportButton: string;
   supportButtonThanks: string;
   supportNote: string;
@@ -195,6 +196,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     sideNoteText:
       "The form prepares a clean message for WhatsApp or email, so members can submit data without waiting for a login or custom server.",
     supportCount: "Support taps",
+    visitorCount: "Visitors",
     supportButton: "I like this website",
     supportButtonThanks: "I liked this website",
     supportNote:
@@ -298,6 +300,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     sideNoteText:
       "यह फॉर्म WhatsApp या Email के लिए साफ संदेश तैयार करता है, ताकि सदस्य बिना लॉगिन या सर्वर के भी विवरण भेज सकें।",
     supportCount: "समर्थन टैप्स",
+    visitorCount: "आगंतुक",
     supportButton: "मैं किशोर कुमार का समर्थन करता हूं",
     supportButtonThanks: "आपके समर्थन के लिए धन्यवाद",
     supportNote: "यह आधिकारिक मतदान नहीं है। यह केवल आपके विश्वास का समर्थन संकेत है।",
@@ -400,6 +403,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     sideNoteText:
       "ଏହି ଫର୍ମ WhatsApp କିମ୍ବା Email ପାଇଁ ସୁଚିତ ବାର୍ତ୍ତା ତିଆରି କରେ, ଯାହାରେ ଲଗଇନ୍ କିମ୍ବା ସର୍ଭର ଛଡା ବି ବିବରଣୀ ପଠାଇପାରିବେ।",
     supportCount: "ସମର୍ଥନ ଟାପ୍",
+    visitorCount: "ପରିଦର୍ଶକ",
     supportButton: "ମୁଁ କିଶୋର କୁମାରଙ୍କୁ ସମର୍ଥନ କରେ",
     supportButtonThanks: "ଆପଣଙ୍କ ସମର୍ଥନ ପାଇଁ ଧନ୍ୟବାଦ",
     supportNote: "ଏହା ଆଧିକାରିକ ଭୋଟିଂ ନୁହେଁ। ଏହା ଆପଣଙ୍କ ବିଶ୍ୱାସର ସମର୍ଥନ ସଙ୍କେତ ମାତ୍ର।",
@@ -502,6 +506,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     sideNoteText:
       "ఈ ఫారం WhatsApp లేదా Email కోసం స్పష్టమైన సందేశాన్ని సిద్ధం చేస్తుంది. కాబట్టి లాగిన్ లేదా సర్వర్ లేకుండా సభ్యులు వివరాలు పంపవచ్చు.",
     supportCount: "సపోర్ట్ ట్యాప్‌లు",
+    visitorCount: "విజిటర్లు",
     supportButton: "నేను కిశోర్ కుమార్‌కు మద్దతు ఇస్తున్నాను",
     supportButtonThanks: "మీ మద్దతుకు ధన్యవాదాలు",
     supportNote: "ఇది అధికారిక ఓటింగ్ కాదు. ఇది మీ మద్దతును అర్థం చేసుకునే సూచిక మాత్రమే.",
@@ -605,12 +610,14 @@ export function CampaignSite({
   memberRecords,
 }: Props) {
   const supportFlagKey = "kishore-support-locked";
+  const visitorFlagKey = "kishore-visitor-counted";
   const slotSelectionKey = "kishore-selected-slot";
   const slotOptions = useMemo(() => buildElectionSlots(), []);
   const [language, setLanguage] = useState<LanguageKey>("en");
   const [searchMode, setSearchMode] = useState<SearchMode>("all");
   const [query, setQuery] = useState("");
   const [supportCount, setSupportCount] = useState(121);
+  const [visitorCount, setVisitorCount] = useState(0);
   const [slotCounts, setSlotCounts] = useState<Record<string, number>>({});
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [slotLoading, setSlotLoading] = useState(false);
@@ -655,6 +662,51 @@ export function CampaignSite({
     }
   }, []);
 
+  const loadVisitorCount = useCallback(async () => {
+    try {
+      const response = await fetch("/api/visitors", { cache: "no-store" });
+      if (!response.ok) {
+        return;
+      }
+
+      const payload = (await response.json()) as { count?: number };
+      if (typeof payload.count === "number") {
+        setVisitorCount(payload.count);
+      }
+    } catch {
+      // Keep current count when the API is temporarily unavailable.
+    }
+  }, []);
+
+  const registerVisitor = useCallback(async () => {
+    const alreadyCounted = window.localStorage.getItem(visitorFlagKey) === "1";
+
+    if (alreadyCounted) {
+      await loadVisitorCount();
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/visitors", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const payload = (await response.json()) as { count?: number };
+        if (typeof payload.count === "number") {
+          setVisitorCount(payload.count);
+        }
+      }
+    } catch {
+      // Ignore temporary errors and continue rendering the page.
+    } finally {
+      window.localStorage.setItem(visitorFlagKey, "1");
+    }
+  }, [loadVisitorCount, visitorFlagKey]);
+
   useEffect(() => {
     function syncLocalState() {
       const isLocked = window.localStorage.getItem(supportFlagKey) === "1";
@@ -666,6 +718,7 @@ export function CampaignSite({
     function refreshFromServer() {
       void loadSupportCount();
       void loadSlotCounts();
+      void loadVisitorCount();
     }
 
     function onVisibilityChange() {
@@ -690,6 +743,7 @@ export function CampaignSite({
     }
 
     syncLocalState();
+    void registerVisitor();
     refreshFromServer();
 
     document.addEventListener("visibilitychange", onVisibilityChange);
@@ -703,7 +757,7 @@ export function CampaignSite({
       window.removeEventListener("pageshow", onPageShow);
       window.removeEventListener("storage", onStorageChange);
     };
-  }, [loadSlotCounts, loadSupportCount]);
+  }, [loadSlotCounts, loadSupportCount, loadVisitorCount, registerVisitor]);
 
   const results = useMemo(() => searchMembers(memberRecords, query, searchMode), [
     memberRecords,
@@ -1227,9 +1281,15 @@ export function CampaignSite({
             >
               {hasSupported ? activeCopy.supportButtonThanks : activeCopy.supportButton}
             </button>
-            <div>
-              <p className={styles.cardLabel}>{activeCopy.supportCount}</p>
-              <h3 className={styles.supportCountValue}>{supportCount}</h3>
+            <div className={styles.supportStats}>
+              <div>
+                <p className={styles.cardLabel}>{activeCopy.supportCount}</p>
+                <h3 className={`${styles.supportCountValue} ${styles.supportCountBlue}`}>{supportCount}</h3>
+              </div>
+              <div>
+                <p className={styles.cardLabel}>{activeCopy.visitorCount}</p>
+                <h3 className={`${styles.supportCountValue} ${styles.supportCountBlack}`}>{visitorCount}</h3>
+              </div>
             </div>
           </div>
         </section>
