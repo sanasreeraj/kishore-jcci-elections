@@ -118,7 +118,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     heroVenue: "Venue",
     heroTime: "Time",
     directionsTitle: "Open directions",
-    primary: "Support Me",
+    primary: "Pick your slot",
     secondary: "Check Eligibility",
     profileKicker: "Who Am I",
     profileTitle: "Why select me.",
@@ -158,7 +158,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     doneLabel: "Done",
     upcomingLabel: "Upcoming",
     searchTitle: "Check Eligibility",
-    searchLead: "Check whether you are eligible.",
+    searchLead: "Search your name in Voter list.",
     eligibilitySearchLabel: "Search",
     searchPlaceholder: "Enter Sl No, address, establishment, or phone",
     supportTitle: "Support Signal",
@@ -611,6 +611,7 @@ export function CampaignSite({
 }: Props) {
   const supportFlagKey = "kishore-support-locked";
   const slotSelectionKey = "kishore-selected-slot";
+  const showBusinessNetwork = false;
   const slotOptions = useMemo(() => buildElectionSlots(), []);
   const [language, setLanguage] = useState<LanguageKey>("en");
   const [searchMode, setSearchMode] = useState<SearchMode>("all");
@@ -927,7 +928,7 @@ export function CampaignSite({
               </div>
             </div>
             <div className={styles.heroActions}>
-              <a className={styles.primaryAction} href="#support">
+              <a className={styles.primaryAction} href="#slots">
                 {activeCopy.primary}
               </a>
               <a className={styles.secondaryAction} href="#eligibility">
@@ -992,33 +993,35 @@ export function CampaignSite({
           </div>
         </section>
 
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <p className={styles.sectionKicker}>{activeCopy.businessKicker}</p>
-            <h2>{activeCopy.businessTitle}</h2>
-          </div>
-          <div className={styles.supporterGrid}>
-            {supporters.map((supporter) => (
-              <article className={styles.supporterCard} key={`${supporter.name}-${supporter.business}`}>
-                <div className={styles.supporterImage} aria-hidden="true">
-                  <Image
-                    src={supporter.image}
-                    alt={supporter.name}
-                    fill
-                    className={styles.supporterPortrait}
-                    sizes="(max-width: 760px) 100vw, (max-width: 1080px) 50vw, 25vw"
-                  />
-                </div>
-                <h3>{supporter.name}</h3>
-                <p className={styles.supporterCompany}>{supporter.business}</p>
-                <p className={styles.supporterLocation}>{supporter.location}</p>
-                <a className={styles.supporterContact} href={`tel:${normalizePhone(supporter.phone)}`}>
-                  {supporter.phone}
-                </a>
-              </article>
-            ))}
-          </div>
-        </section>
+        {showBusinessNetwork ? (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <p className={styles.sectionKicker}>{activeCopy.businessKicker}</p>
+              <h2>{activeCopy.businessTitle}</h2>
+            </div>
+            <div className={styles.supporterGrid}>
+              {supporters.map((supporter) => (
+                <article className={styles.supporterCard} key={`${supporter.name}-${supporter.business}`}>
+                  <div className={styles.supporterImage} aria-hidden="true">
+                    <Image
+                      src={supporter.image}
+                      alt={supporter.name}
+                      fill
+                      className={styles.supporterPortrait}
+                      sizes="(max-width: 760px) 100vw, (max-width: 1080px) 50vw, 25vw"
+                    />
+                  </div>
+                  <h3>{supporter.name}</h3>
+                  <p className={styles.supporterCompany}>{supporter.business}</p>
+                  <p className={styles.supporterLocation}>{supporter.location}</p>
+                  <a className={styles.supporterContact} href={`tel:${normalizePhone(supporter.phone)}`}>
+                    {supporter.phone}
+                  </a>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
