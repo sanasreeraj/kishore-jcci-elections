@@ -53,6 +53,7 @@ type CampaignCopy = {
   timelineLabels: string[];
   doneLabel: string;
   upcomingLabel: string;
+  ongoingLabel: string;
   searchTitle: string;
   searchLead: string;
   eligibilitySearchLabel: string;
@@ -159,6 +160,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     ],
     doneLabel: "Done",
     upcomingLabel: "Upcoming",
+    ongoingLabel: "Ongoing",
     searchTitle: "Check Eligibility",
     searchLead: "Search your name in Voter list.",
     eligibilitySearchLabel: "Search",
@@ -265,6 +267,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     ],
     doneLabel: "पूरा",
     upcomingLabel: "आगामी",
+    ongoingLabel: "जारी",
     searchTitle: "पात्रता जांचें",
     searchLead: "अपना नाम मतदाता सूची में खोजें।",
     eligibilitySearchLabel: "खोज",
@@ -370,6 +373,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     ],
     doneLabel: "ସମ୍ପୂର୍ଣ୍ଣ",
     upcomingLabel: "ଆସନ୍ତା",
+    ongoingLabel: "ଚାଲୁଛି",
     searchTitle: "ଯୋଗ୍ୟତା ଯାଞ୍ଚ",
     searchLead: "ମତଦାତା ତାଲିକାରେ ଆପଣଙ୍କର ନାମ ଖୋଜନ୍ତୁ।",
     eligibilitySearchLabel: "ଖୋଜନ୍ତୁ",
@@ -475,6 +479,7 @@ const copy: Record<LanguageKey, CampaignCopy> = {
     ],
     doneLabel: "పూర్తి",
     upcomingLabel: "రాబోయే",
+    ongoingLabel: "కొనసాగుతోంది",
     searchTitle: "అర్హత తనిఖీ",
     searchLead: "ఓటర్ జాబితాలో మీ పేరు ఖోజండి.",
     eligibilitySearchLabel: "వెతుకు",
@@ -613,6 +618,71 @@ function renderHighlightedText(text: string, highlights: string[] = []) {
   });
 }
 
+type TimelineStatus = "done" | "upcoming" | "ongoing";
+
+function getIstDateParts(now: Date) {
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(now);
+  const valueByType = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+  return {
+    isoDate: `${valueByType.year}-${valueByType.month}-${valueByType.day}`,
+    minutesFromMidnight:
+      Number(valueByType.hour ?? "0") * 60 + Number(valueByType.minute ?? "0"),
+  };
+}
+
+function resolveTimelineStatus(
+  step: ElectionInfo["timeline"][number],
+  index: number,
+  now: Date,
+): TimelineStatus {
+  const votingIndex = 4;
+  const countingIndex = 5;
+
+  if (index !== votingIndex && index !== countingIndex) {
+    return step.status;
+  }
+
+  const eventDate = "2026-04-12";
+  const { isoDate, minutesFromMidnight } = getIstDateParts(now);
+
+  if (isoDate < eventDate) {
+    return "upcoming";
+  }
+
+  if (isoDate > eventDate) {
+    return "done";
+  }
+
+  if (index === votingIndex) {
+    if (minutesFromMidnight < 9 * 60) {
+      return "upcoming";
+    }
+    if (minutesFromMidnight < 15 * 60) {
+      return "ongoing";
+    }
+    return "done";
+  }
+
+  if (minutesFromMidnight < 15 * 60 + 30) {
+    return "upcoming";
+  }
+  if (minutesFromMidnight < 21 * 60) {
+    return "ongoing";
+  }
+  return "done";
+}
+
 export function CampaignSite({
   candidate,
   election,
@@ -639,6 +709,17 @@ export function CampaignSite({
   const [submissionAddress, setSubmissionAddress] = useState("");
   const [submissionNote, setSubmissionNote] = useState("");
   const [isMissingModalOpen, setIsMissingModalOpen] = useState(false);
+  const [timelineNow, setTimelineNow] = useState<Date>(() => new Date());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setTimelineNow(new Date());
+    }, 60_000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, []);
 
   const loadSupportCount = useCallback(async () => {
     try {
@@ -1051,24 +1132,34 @@ export function CampaignSite({
             <article className={styles.infoCard}>
               <p className={styles.cardLabel}>{activeCopy.calendarLabel}</p>
               <ul className={styles.timelineCalendar}>
-                {election.timeline.map((step, index) => (
-                  <li key={`${step.label}-${step.detail}`} className={styles.timelineItem}>
-                    <div className={styles.timelineDateBadge}>{step.date}</div>
-                    <div className={styles.timelineContent}>
-                      <div className={styles.timelineHeadingRow}>
-                        <strong>{activeCopy.timelineLabels[index] ?? step.label}</strong>
-                        <span
-                          className={
-                            step.status === "done" ? styles.timelineDoneCapsule : styles.timelineUpcomingCapsule
-                          }
-                        >
-                          {step.status === "done" ? activeCopy.doneLabel : activeCopy.upcomingLabel}
-                        </span>
+                {election.timeline.map((step, index) => {
+                  const timelineStatus = resolveTimelineStatus(step, index, timelineNow);
+                  const statusClassName =
+                    timelineStatus === "done"
+                      ? styles.timelineDoneCapsule
+                      : timelineStatus === "ongoing"
+                        ? styles.timelineOngoingCapsule
+                        : styles.timelineUpcomingCapsule;
+                  const statusLabel =
+                    timelineStatus === "done"
+                      ? activeCopy.doneLabel
+                      : timelineStatus === "ongoing"
+                        ? activeCopy.ongoingLabel
+                        : activeCopy.upcomingLabel;
+
+                  return (
+                    <li key={`${step.label}-${step.detail}`} className={styles.timelineItem}>
+                      <div className={styles.timelineDateBadge}>{step.date}</div>
+                      <div className={styles.timelineContent}>
+                        <div className={styles.timelineHeadingRow}>
+                          <strong>{activeCopy.timelineLabels[index] ?? step.label}</strong>
+                          <span className={statusClassName}>{statusLabel}</span>
+                        </div>
+                        <span>{step.detail}</span>
                       </div>
-                      <span>{step.detail}</span>
-                    </div>
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
             </article>
           </div>

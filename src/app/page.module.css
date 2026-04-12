@@ -1104,7 +1104,8 @@
 }
 
 .timelineDoneCapsule,
-.timelineUpcomingCapsule {
+.timelineUpcomingCapsule,
+.timelineOngoingCapsule {
   display: inline-flex;
   align-items: center;
   padding: 5px 10px;
@@ -1123,6 +1124,11 @@
 .timelineUpcomingCapsule {
   color: #1d4ed8;
   background: rgba(59, 130, 246, 0.18);
+}
+
+.timelineOngoingCapsule {
+  color: #92400e;
+  background: rgba(251, 191, 36, 0.24);
 }
 
 .searchPanel,
