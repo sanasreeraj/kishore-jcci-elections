@@ -551,6 +551,36 @@ type SlotItem = {
   label: string;
 };
 
+type ElectionResultRow = {
+  ballotNo: number;
+  name: string;
+  votes: number;
+};
+
+const electionResultsTop21: ElectionResultRow[] = [
+  { ballotNo: 28, name: "Sanjay Kumar Jain", votes: 610 },
+  { ballotNo: 24, name: "Nemani Chaitanya", votes: 591 },
+  { ballotNo: 17, name: "K Dillip Reddy", votes: 583 },
+  { ballotNo: 12, name: "Dinesh Sunkari", votes: 576 },
+  { ballotNo: 18, name: "K Rama Krishna", votes: 557 },
+  { ballotNo: 31, name: "Satish Kumar Patro (Nilui)", votes: 555 },
+  { ballotNo: 1, name: "A Srinivasa Rao (Arugula)", votes: 551 },
+  { ballotNo: 35, name: "V Prabhakar", votes: 516 },
+  { ballotNo: 11, name: "D Madhav", votes: 494 },
+  { ballotNo: 4, name: "B Satish Kumar", votes: 490 },
+  { ballotNo: 14, name: "Gembali Vasanta Rao", votes: 475 },
+  { ballotNo: 27, name: "Sanjay Kumar Jain", votes: 470 },
+  { ballotNo: 8, name: "Ch Kishore Kumar", votes: 462 },
+  { ballotNo: 20, name: "Kella Iswar Rao", votes: 460 },
+  { ballotNo: 21, name: "Loknath Patro", votes: 459 },
+  { ballotNo: 3, name: "Ankur Soni", votes: 452 },
+  { ballotNo: 22, name: "Manoj Kumar Shah", votes: 443 },
+  { ballotNo: 7, name: "Bibhu Dutta Padhi (Luna)", votes: 404 },
+  { ballotNo: 9, name: "Chandresh Rathod", votes: 400 },
+  { ballotNo: 6, name: "Barun Kumar Jain", votes: 391 },
+  { ballotNo: 33, name: "Surya Narayana Patnaik", votes: 384 },
+];
+
 function normalizePhone(value: string) {
   return value.replace(/\D/g, "");
 }
@@ -709,7 +739,18 @@ export function CampaignSite({
   const [submissionAddress, setSubmissionAddress] = useState("");
   const [submissionNote, setSubmissionNote] = useState("");
   const [isMissingModalOpen, setIsMissingModalOpen] = useState(false);
+  const [isResultsPopupOpen, setIsResultsPopupOpen] = useState(true);
   const [timelineNow, setTimelineNow] = useState<Date>(() => new Date());
+
+  useEffect(() => {
+    const autoCloseTimer = window.setTimeout(() => {
+      setIsResultsPopupOpen(false);
+    }, 120_000);
+
+    return () => {
+      window.clearTimeout(autoCloseTimer);
+    };
+  }, []);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -947,6 +988,58 @@ export function CampaignSite({
 
   return (
     <div className={styles.shell}>
+      {isResultsPopupOpen ? (
+        <div
+          className={styles.resultsPopupBackdrop}
+          role="dialog"
+          aria-modal="true"
+          aria-label="JCCI Election Results 2026-27"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setIsResultsPopupOpen(false);
+            }
+          }}
+        >
+          <div className={styles.resultsPopupCard}>
+            <div className={styles.resultsPopupHeader}>
+              <div>
+                <p className={styles.sectionKicker}>Official Announcement</p>
+                <h3>JCCI Election Results 2026-27 (Top 21)</h3>
+                <p>Congratulations to the new Core team of JCCI, 21 Directors.</p>
+              </div>
+              <button
+                type="button"
+                className={styles.modalCloseButton}
+                onClick={() => setIsResultsPopupOpen(false)}
+              >
+                {activeCopy.close}
+              </button>
+            </div>
+
+            <div className={styles.resultsTableWrap}>
+              <table className={styles.resultsTable}>
+                <thead>
+                  <tr>
+                    <th>Ballot No.</th>
+                    <th>Name</th>
+                    <th>Votes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {electionResultsTop21.map((row) => (
+                    <tr key={`${row.ballotNo}-${row.name}`}>
+                      <td>{row.ballotNo}</td>
+                      <td>{row.name}</td>
+                      <td>{row.votes}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <header className={styles.topbar}>
         <div className={styles.brandLockup}>
           <Image

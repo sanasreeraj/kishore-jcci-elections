@@ -1418,6 +1418,106 @@
   font-weight: 700;
 }
 
+.resultsPopupBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.56);
+  backdrop-filter: blur(5px);
+}
+
+.resultsPopupCard {
+  width: min(960px, 100%);
+  max-height: min(86vh, 920px);
+  overflow-y: auto;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(241, 245, 249, 0.97));
+  box-shadow: 0 26px 56px rgba(2, 6, 23, 0.34);
+}
+
+.resultsPopupHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.resultsPopupHeader h3 {
+  margin: 6px 0 0;
+  color: #0f172a;
+  font-size: clamp(1.1rem, 2.6vw, 1.42rem);
+}
+
+.resultsPopupHeader p {
+  margin: 8px 0 0;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.resultsTableWrap {
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.resultsTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.resultsTable th,
+.resultsTable td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+.resultsTable th:nth-child(1),
+.resultsTable td:nth-child(1) {
+  width: 18%;
+}
+
+.resultsTable th:nth-child(2),
+.resultsTable td:nth-child(2) {
+  width: 62%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.resultsTable th:nth-child(3),
+.resultsTable td:nth-child(3) {
+  width: 20%;
+}
+
+.resultsTable th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 0.83rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.resultsTable td:last-child,
+.resultsTable th:last-child {
+  text-align: right;
+}
+
+.resultsTable tbody tr:nth-child(even) {
+  background: rgba(248, 250, 252, 0.8);
+}
+
 .submissionForm {
   display: grid;
   gap: 14px;
@@ -1848,6 +1948,45 @@
   .modalHeader {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .resultsPopupBackdrop {
+    padding: 10px;
+  }
+
+  .resultsPopupCard {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .resultsPopupHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .resultsPopupHeader p {
+    font-size: 0.9rem;
+  }
+
+  .resultsTable th,
+  .resultsTable td {
+    padding: 8px 6px;
+    font-size: 0.8rem;
+  }
+
+  .resultsTable th:nth-child(1),
+  .resultsTable td:nth-child(1) {
+    width: 17%;
+  }
+
+  .resultsTable th:nth-child(2),
+  .resultsTable td:nth-child(2) {
+    width: 59%;
+  }
+
+  .resultsTable th:nth-child(3),
+  .resultsTable td:nth-child(3) {
+    width: 24%;
   }
 
   .timelineItem {
