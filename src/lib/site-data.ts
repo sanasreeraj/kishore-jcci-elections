@@ -17,6 +17,20 @@ export type Supporter = {
   image: string;
 };
 
+export type DirectorProfile = {
+  id: string;
+  name: string;
+  businessName: string;
+  businessAddress: string;
+  residenceAddress: string;
+  photoUrl: string;
+  contactNumber: string;
+  whatsappNumber: string;
+  email: string;
+  experienceExpertise: string;
+  createdAt: string;
+};
+
 export type CandidateProfile = {
   name: string;
   position: string;
@@ -301,4 +315,139 @@ export async function deleteMemberRecordInSupabase(slNo: string) {
   if (error) {
     throw new Error(error.message);
   }
+}
+
+const directorFallbackStore: DirectorProfile[] = [];
+
+function toDirectorProfile(row: {
+  id?: string | null;
+  full_name?: string | null;
+  business_name?: string | null;
+  business_address?: string | null;
+  residence_address?: string | null;
+  photo_url?: string | null;
+  contact_number?: string | null;
+  whatsapp_number?: string | null;
+  email?: string | null;
+  experience_expertise?: string | null;
+  created_at?: string | null;
+}): DirectorProfile {
+  return {
+    id: (row.id ?? "").trim(),
+    name: (row.full_name ?? "").trim(),
+    businessName: (row.business_name ?? "").trim(),
+    businessAddress: (row.business_address ?? "").trim(),
+    residenceAddress: (row.residence_address ?? "").trim(),
+    photoUrl: (row.photo_url ?? "").trim(),
+    contactNumber: (row.contact_number ?? "").trim(),
+    whatsappNumber: (row.whatsapp_number ?? "").trim(),
+    email: (row.email ?? "").trim(),
+    experienceExpertise: (row.experience_expertise ?? "").trim(),
+    createdAt: (row.created_at ?? new Date().toISOString()).trim(),
+  };
+}
+
+export async function loadDirectorProfilesFromSupabase(): Promise<DirectorProfile[]> {
+  if (!hasSupabaseConfig || !supabaseServer) {
+    return [...directorFallbackStore];
+  }
+
+  const { data, error } = await supabaseServer
+    .from("jcci_directors")
+    .select(
+      "id,full_name,business_name,business_address,residence_address,photo_url,contact_number,whatsapp_number,email,experience_expertise,created_at",
+    )
+    .order("created_at", { ascending: false });
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data.map((row) =>
+    toDirectorProfile({
+      id: row.id,
+      full_name: row.full_name,
+      business_name: row.business_name,
+      business_address: row.business_address,
+      residence_address: row.residence_address,
+      photo_url: row.photo_url,
+      contact_number: row.contact_number,
+      whatsapp_number: row.whatsapp_number,
+      email: row.email,
+      experience_expertise: row.experience_expertise,
+      created_at: row.created_at,
+    }),
+  );
+}
+
+export async function loadDirectorProfiles(): Promise<DirectorProfile[]> {
+  return await loadDirectorProfilesFromSupabase();
+}
+
+export async function createDirectorProfileInSupabase(input: {
+  name: string;
+  businessName: string;
+  businessAddress: string;
+  residenceAddress: string;
+  photoUrl: string;
+  contactNumber: string;
+  whatsappNumber: string;
+  email: string;
+  experienceExpertise: string;
+}): Promise<DirectorProfile> {
+  if (!hasSupabaseConfig || !supabaseServer) {
+    const id = globalThis.crypto?.randomUUID?.() ?? `local-${Date.now().toString(36)}`;
+    const record: DirectorProfile = {
+      id,
+      name: input.name,
+      businessName: input.businessName,
+      businessAddress: input.businessAddress,
+      residenceAddress: input.residenceAddress,
+      photoUrl: input.photoUrl,
+      contactNumber: input.contactNumber,
+      whatsappNumber: input.whatsappNumber,
+      email: input.email,
+      experienceExpertise: input.experienceExpertise,
+      createdAt: new Date().toISOString(),
+    };
+
+    directorFallbackStore.unshift(record);
+    return record;
+  }
+
+  const { data, error } = await supabaseServer
+    .from("jcci_directors")
+    .insert({
+      full_name: input.name,
+      business_name: input.businessName,
+      business_address: input.businessAddress,
+      residence_address: input.residenceAddress,
+      photo_url: input.photoUrl,
+      contact_number: input.contactNumber,
+      whatsapp_number: input.whatsappNumber,
+      email: input.email,
+      experience_expertise: input.experienceExpertise,
+    })
+    .select(
+      "id,full_name,business_name,business_address,residence_address,photo_url,contact_number,whatsapp_number,email,experience_expertise,created_at",
+    )
+    .single();
+
+  if (error || !data) {
+    throw new Error(error?.message ?? "Unable to create director profile");
+  }
+
+  return toDirectorProfile({
+    id: data.id,
+    full_name: data.full_name,
+    business_name: data.business_name,
+    business_address: data.business_address,
+    residence_address: data.residence_address,
+    photo_url: data.photo_url,
+    contact_number: data.contact_number,
+    whatsapp_number: data.whatsapp_number,
+    email: data.email,
+    experience_expertise: data.experience_expertise,
+    created_at: data.created_at,
+  });
 }

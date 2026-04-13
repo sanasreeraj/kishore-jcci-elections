@@ -10,11 +10,27 @@
   z-index: 20;
   display: flex;
   flex-wrap: wrap;
+.directorCard h3 {
+  margin: 0;
+  font-size: 1.04rem;
+  line-height: 1.25;
+}
   align-items: center;
   justify-content: space-between;
   gap: 10px 14px;
   padding: 12px 16px;
   margin-bottom: 10px;
+.directorFileIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(226, 232, 240, 0.8);
+  color: #334155;
+  font-size: 1.05rem;
+}
   border: 1px solid rgba(255, 255, 255, 0.74);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.78);
@@ -32,6 +48,83 @@
 
 .brandHeadlines {
   display: grid;
+
+  .directorCard {
+    padding: 12px;
+    border-radius: 14px;
+    gap: 8px;
+  }
+
+  #directors .sectionKicker {
+    font-size: 0.66rem;
+  }
+
+  #directors h2 {
+    font-size: clamp(1.1rem, 6.2vw, 1.45rem);
+    line-height: 1.12;
+  }
+
+  .directorForm {
+    gap: 10px;
+  }
+
+  .directorFormIntro {
+    padding: 12px;
+    gap: 6px;
+    border-radius: 14px;
+  }
+
+  .directorFormIntro p {
+    font-size: 0.84rem;
+    line-height: 1.4;
+  }
+
+  .directorField {
+    gap: 6px;
+  }
+
+  .directorField span {
+    font-size: 0.86rem;
+  }
+
+  .directorField input,
+  .directorField textarea {
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+  }
+
+  .directorFileInputLabel {
+    gap: 7px;
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+
+  .directorFileTitle {
+    font-size: 0.86rem;
+  }
+
+  .directorFileHint,
+  .directorHelper {
+    font-size: 0.74rem;
+  }
+
+  .directorFileButton {
+    min-height: 30px;
+    padding: 4px 10px;
+    font-size: 0.76rem;
+  }
+
+  .directorFileIcon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.96rem;
+  }
+
+  .directorPhonePrefix {
+    padding: 0 10px;
+    font-size: 0.84rem;
+  }
   gap: 2px;
 }
 
@@ -137,32 +230,54 @@
   animation: fadeInUp 0.7s ease both;
 }
 
+.heroContent {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+}
+
 .heroContent h1 {
-  margin-top: 10px;
+  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: clamp(2.6rem, 5.2vw, 4.8rem);
   line-height: 0.94;
   letter-spacing: -0.06em;
-  font-weight: 700;
+  font-weight: 650;
 }
 
 .heroLead {
   max-width: 58ch;
-  margin-top: 12px;
+  margin: 2px 0 6px;
   color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.62;
+  font-size: clamp(1.03rem, 1.45vw, 1.34rem);
+  line-height: 1.52;
+  letter-spacing: -0.01em;
 }
 
 .voteHighlight {
   display: block;
   width: fit-content;
-  margin-bottom: 2px;
+  margin-bottom: 0;
   color: var(--accent-strong);
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: -0.02em;
   font-size: clamp(1.55rem, 2.6vw, 2.25rem);
   line-height: 1.05;
+}
+
+.heroMetric {
+  display: inline;
+  color: var(--accent-strong);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.heroTransitionNote {
+  margin: auto 0 0;
+  max-width: 52ch;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(71, 85, 105, 0.9);
 }
 
 .heroPillRow,
@@ -172,6 +287,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.heroActions {
+  margin-top: 6px;
 }
 
 .tagList {
@@ -709,6 +828,10 @@
     gap: 16px;
   }
 
+  .heroContent {
+    gap: 8px;
+  }
+
   .heroContent h1 {
     font-size: clamp(2.05rem, 11vw, 3.2rem);
     line-height: 0.96;
@@ -743,6 +866,20 @@
   .modeRow,
   .tagList {
     gap: 8px;
+  }
+
+  .heroLead {
+    margin-bottom: 2px;
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  .heroTransitionNote {
+    font-size: 0.78rem;
+  }
+
+  .heroMetric {
+    font-weight: 680;
   }
 
   .languageSwitcher {
@@ -1660,6 +1797,306 @@
   line-height: 1.2;
 }
 
+.directorSectionActions {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0;
+}
+
+.directorHeaderRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.directorGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 0;
+}
+
+.directorCard {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.directorPhotoWrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(226, 232, 240, 0.4);
+}
+
+.directorPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.directorBusiness {
+  margin: 0;
+  color: #475569;
+}
+
+.directorQuickActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.directorIconButton {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(30, 64, 175, 0.16);
+  background: rgba(239, 246, 255, 0.96);
+  color: #1d4ed8;
+}
+
+.directorForm {
+  display: grid;
+  gap: 14px;
+  padding: 2px 0 0;
+}
+
+.directorFormIntro {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.92), rgba(255, 255, 255, 0.96));
+  border: 1px solid rgba(191, 219, 254, 0.9);
+}
+
+.directorFormIntro p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.directorFormBadge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.directorFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.directorField {
+  display: grid;
+  gap: 8px;
+}
+
+.directorField span {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.directorField input,
+.directorField textarea {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 12px 14px;
+  color: #0f172a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.directorField input:focus,
+.directorField textarea:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.42);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.directorField input::placeholder,
+.directorField textarea::placeholder {
+  color: #94a3b8;
+}
+
+.directorHelper {
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.directorFileInputWrap {
+  position: relative;
+}
+
+.directorFileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.directorFileInputLabel {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 24px 16px;
+  border-radius: 14px;
+  border: 2px dashed rgba(148, 163, 184, 0.55);
+  background: rgba(248, 250, 252, 0.92);
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.directorFileInputLabel:hover {
+  border-color: rgba(37, 99, 235, 0.42);
+  background: rgba(239, 246, 255, 0.95);
+}
+
+.directorFileInput:focus + .directorFileInputLabel {
+  border-color: rgba(37, 99, 235, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.directorFileTitle {
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.directorFileHint {
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.directorFileButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.42);
+  background: rgba(255, 255, 255, 0.95);
+  color: #334155;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.directorPhoneInput {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.directorPhoneInput:focus-within {
+  border-color: rgba(37, 99, 235, 0.42);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.directorPhonePrefix {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.96), rgba(255, 255, 255, 0.98));
+  color: #1d4ed8;
+  font-weight: 700;
+  white-space: nowrap;
+  border-right: 1px solid rgba(191, 219, 254, 0.9);
+}
+
+.directorPhoneInput input {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.directorPhoneInput input:focus {
+  box-shadow: none;
+}
+
+.directorField textarea {
+  resize: vertical;
+}
+
+.directorPreviewImage {
+  width: min(220px, 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+}
+
+.directorError {
+  color: #b91c1c;
+  font-size: 0.84rem;
+}
+
+.directorErrorBanner {
+  margin: 0;
+  color: #991b1b;
+  background: rgba(254, 226, 226, 0.95);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.directorDetailLayout {
+  display: grid;
+  grid-template-columns: minmax(200px, 280px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.directorDetailPhoto {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+}
+
+.directorDetailBody {
+  display: grid;
+  gap: 8px;
+}
+
+.directorDetailBody strong {
+  color: #0f172a;
+}
+
+.directorDetailBody p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.5;
+}
+
 .heroActions a:focus-visible,
 .supportButton:focus-visible,
 .contactCard:focus-visible,
@@ -1948,6 +2385,32 @@
   .modalHeader {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .directorSectionActions {
+    justify-content: stretch;
+  }
+
+  .directorHeaderRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .directorSectionActions .primaryAction {
+    width: 100%;
+  }
+
+  .directorGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .directorFormGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .directorDetailLayout {
+    grid-template-columns: 1fr;
   }
 
   .resultsPopupBackdrop {

@@ -1,8 +1,9 @@
 import { CampaignSite } from "@/components/campaign-site";
-import { candidateProfile, electionInfo, loadMemberRecords, supporters } from "@/lib/site-data";
+import { candidateProfile, electionInfo, loadDirectorProfiles, loadMemberRecords, supporters } from "@/lib/site-data";
 
 export default async function Home() {
   const memberRecords = await loadMemberRecords();
+  const directorProfiles = await loadDirectorProfiles();
 
   return (
     <CampaignSite
@@ -10,6 +11,7 @@ export default async function Home() {
       election={electionInfo}
       supporters={supporters}
       memberRecords={memberRecords}
+      directorProfiles={directorProfiles}
     />
   );
 }

@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { BiEnvelope, BiNavigation, BiPhoneCall } from "react-icons/bi";
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import { BiCloudUpload, BiEnvelope, BiPhoneCall } from "react-icons/bi";
 import { FaFacebook, FaGithub, FaInstagram, FaLinkedinIn } from "react-icons/fa6";
 import { FaWhatsapp } from "react-icons/fa6";
 
-import type { CandidateProfile, ElectionInfo, MemberRecord, Supporter } from "@/lib/site-data";
+import type { CandidateProfile, DirectorProfile, ElectionInfo, MemberRecord, Supporter } from "@/lib/site-data";
 import { searchMembers } from "@/lib/search";
 import styles from "../app/page.module.css";
 
@@ -18,6 +18,7 @@ type Props = {
   election: ElectionInfo;
   supporters: Supporter[];
   memberRecords: MemberRecord[];
+  directorProfiles: DirectorProfile[];
 };
 
 type CampaignCopy = {
@@ -551,6 +552,32 @@ type SlotItem = {
   label: string;
 };
 
+type DirectorFormState = {
+  name: string;
+  businessName: string;
+  businessAddress: string;
+  residenceAddress: string;
+  photoUrl: string;
+  contactNumber: string;
+  whatsappNumber: string;
+  email: string;
+  experienceExpertise: string;
+};
+
+type DirectorFormErrors = Partial<Record<keyof DirectorFormState, string>>;
+
+const emptyDirectorForm: DirectorFormState = {
+  name: "",
+  businessName: "",
+  businessAddress: "",
+  residenceAddress: "",
+  photoUrl: "",
+  contactNumber: "",
+  whatsappNumber: "",
+  email: "",
+  experienceExpertise: "",
+};
+
 type ElectionResultRow = {
   ballotNo: number;
   name: string;
@@ -580,6 +607,23 @@ const electionResultsTop21: ElectionResultRow[] = [
   { ballotNo: 6, name: "Barun Kumar Jain", votes: 391 },
   { ballotNo: 33, name: "Surya Narayana Patnaik", votes: 384 },
 ];
+
+function canonicalizeDirectorName(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const eligibleDirectorNameSet = new Set(
+  electionResultsTop21.flatMap((item) => {
+    const exact = canonicalizeDirectorName(item.name);
+    const withoutBracket = canonicalizeDirectorName(item.name.replace(/\([^)]*\)/g, " "));
+    return [exact, withoutBracket].filter(Boolean);
+  }),
+);
 
 function normalizePhone(value: string) {
   return value.replace(/\D/g, "");
@@ -713,14 +757,119 @@ function resolveTimelineStatus(
   return "done";
 }
 
+function normalizeIndianPhone(input: string) {
+  const digits = input.replace(/\D/g, "");
+
+  if (digits.length === 10) {
+    return `+91${digits}`;
+  }
+
+  return "";
+}
+
+function isValidIndianPhone(value: string) {
+  return /^\+91[6-9]\d{9}$/.test(value);
+}
+
+function sanitizeTextOnly(value: string) {
+  return value.replace(/[^A-Za-z\s.'-]/g, "");
+}
+
+function sanitizeAlphaNumeric(value: string) {
+  return value.replace(/[^A-Za-z0-9\s.,'()\-/#&:]/g, "");
+}
+
+function sanitizePhoneDigits(value: string) {
+  return value.replace(/\D/g, "").slice(0, 10);
+}
+
+function titleCaseWords(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/\b[a-z]/g, (character) => character.toUpperCase())
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function validateDirectorForm(form: DirectorFormState) {
+  const errors: DirectorFormErrors = {};
+  const name = titleCaseWords(sanitizeTextOnly(form.name));
+  const businessName = titleCaseWords(sanitizeTextOnly(form.businessName));
+  const businessAddress = sanitizeAlphaNumeric(form.businessAddress).trim();
+  const residenceAddress = sanitizeAlphaNumeric(form.residenceAddress).trim();
+  const experienceExpertise = sanitizeAlphaNumeric(form.experienceExpertise).trim();
+  const contactNumber = sanitizePhoneDigits(form.contactNumber);
+  const whatsappNumber = sanitizePhoneDigits(form.whatsappNumber);
+  const normalizedContact = contactNumber ? `+91${contactNumber}` : "";
+  const normalizedWhatsapp = whatsappNumber ? `+91${whatsappNumber}` : "";
+
+  if (!name) {
+    errors.name = "Name is required";
+  }
+
+  if (name && !eligibleDirectorNameSet.has(canonicalizeDirectorName(name))) {
+    errors.name = "Only the announced 21 JCCI Directors can submit this form";
+  }
+  if (!businessName) {
+    errors.businessName = "Business Name is required";
+  }
+  if (!businessAddress) {
+    errors.businessAddress = "Business Address is required";
+  }
+  if (!residenceAddress) {
+    errors.residenceAddress = "Residence / Address is required";
+  }
+  if (!form.photoUrl.trim()) {
+    errors.photoUrl = "Photo is required";
+  }
+
+  if (!normalizedContact || !isValidIndianPhone(normalizedContact)) {
+    errors.contactNumber = "Contact number must be 10 digits only";
+  }
+
+  if (!normalizedWhatsapp || !isValidIndianPhone(normalizedWhatsapp)) {
+    errors.whatsappNumber = "WhatsApp number must be 10 digits only";
+  }
+
+  if (!form.email.trim() || !isValidEmail(form.email.trim())) {
+    errors.email = "A valid email is required";
+  }
+
+  if (!experienceExpertise) {
+    errors.experienceExpertise = "Experience & Expertise is required";
+  }
+
+  return {
+    errors,
+    normalized: {
+      ...form,
+      name,
+      businessName,
+      businessAddress,
+      residenceAddress,
+      photoUrl: form.photoUrl.trim(),
+      contactNumber: normalizedContact,
+      whatsappNumber: normalizedWhatsapp,
+      email: form.email.trim().toLowerCase(),
+      experienceExpertise,
+    },
+  };
+}
+
 export function CampaignSite({
   candidate,
   election,
   supporters,
   memberRecords,
+  directorProfiles = [],
 }: Props) {
   const supportFlagKey = "kishore-support-locked";
   const slotSelectionKey = "kishore-selected-slot";
+  const showWhoAmI = false;
   const showBusinessNetwork = false;
   const slotOptions = useMemo(() => buildElectionSlots(), []);
   const [language, setLanguage] = useState<LanguageKey>("en");
@@ -739,6 +888,14 @@ export function CampaignSite({
   const [submissionAddress, setSubmissionAddress] = useState("");
   const [submissionNote, setSubmissionNote] = useState("");
   const [isMissingModalOpen, setIsMissingModalOpen] = useState(false);
+  const [directors, setDirectors] = useState<DirectorProfile[]>(() => directorProfiles ?? []);
+  const [isDirectorFormOpen, setIsDirectorFormOpen] = useState(false);
+  const [selectedDirector, setSelectedDirector] = useState<DirectorProfile | null>(null);
+  const [directorForm, setDirectorForm] = useState<DirectorFormState>(emptyDirectorForm);
+  const [directorFormErrors, setDirectorFormErrors] = useState<DirectorFormErrors>({});
+  const [directorFormMessage, setDirectorFormMessage] = useState("");
+  const [directorSubmitting, setDirectorSubmitting] = useState(false);
+  const [directorPhotoFileName, setDirectorPhotoFileName] = useState("");
   const [isResultsPopupOpen, setIsResultsPopupOpen] = useState(true);
   const [timelineNow, setTimelineNow] = useState<Date>(() => new Date());
 
@@ -810,6 +967,22 @@ export function CampaignSite({
     }
   }, []);
 
+  const loadDirectors = useCallback(async () => {
+    try {
+      const response = await fetch("/api/directors", { cache: "no-store" });
+      if (!response.ok) {
+        return;
+      }
+
+      const payload = (await response.json()) as { directors?: DirectorProfile[] };
+      if (Array.isArray(payload.directors)) {
+        setDirectors(payload.directors);
+      }
+    } catch {
+      // Keep existing director cards if API is temporarily unavailable.
+    }
+  }, []);
+
   const registerVisitor = useCallback(async () => {
     try {
       const response = await fetch("/api/visitors", {
@@ -846,6 +1019,7 @@ export function CampaignSite({
       void loadSupportCount();
       void loadSlotCounts();
       void loadVisitorCount();
+      void loadDirectors();
     }
 
     function onVisibilityChange() {
@@ -884,7 +1058,97 @@ export function CampaignSite({
       window.removeEventListener("pageshow", onPageShow);
       window.removeEventListener("storage", onStorageChange);
     };
-  }, [loadSlotCounts, loadSupportCount, loadVisitorCount, registerVisitor]);
+  }, [loadDirectors, loadSlotCounts, loadSupportCount, loadVisitorCount, registerVisitor]);
+
+  function updateDirectorField<K extends keyof DirectorFormState>(key: K, value: DirectorFormState[K]) {
+    setDirectorForm((previous) => ({ ...previous, [key]: value }));
+    if (directorFormErrors[key]) {
+      setDirectorFormErrors((previous) => ({ ...previous, [key]: undefined }));
+    }
+    if (directorFormMessage) {
+      setDirectorFormMessage("");
+    }
+  }
+
+  async function onDirectorPhotoChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    setDirectorPhotoFileName(file.name);
+
+    if (!file.type.startsWith("image/")) {
+      const allowedExtensions = /\.(jpe?g|png|heic|heif|webp|gif|bmp|avif)$/i;
+      if (!allowedExtensions.test(file.name)) {
+        setDirectorFormErrors((previous) => ({
+          ...previous,
+          photoUrl: "Please upload a valid image file",
+        }));
+        setDirectorPhotoFileName("");
+        return;
+      }
+    }
+
+    // Keep payloads small enough for API body limits and faster loads.
+    const maxSizeInBytes = 700 * 1024;
+    if (file.size > maxSizeInBytes) {
+      setDirectorFormErrors((previous) => ({
+        ...previous,
+        photoUrl: "Image must be 700KB or smaller",
+      }));
+      setDirectorPhotoFileName("");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const value = typeof reader.result === "string" ? reader.result : "";
+      updateDirectorField("photoUrl", value);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function submitDirectorProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const { errors, normalized } = validateDirectorForm(directorForm);
+    if (Object.keys(errors).length) {
+      setDirectorFormErrors(errors);
+      return;
+    }
+
+    setDirectorSubmitting(true);
+    setDirectorFormMessage("");
+
+    try {
+      const response = await fetch("/api/directors", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(normalized),
+      });
+
+      const payload = (await response.json()) as { director?: DirectorProfile; error?: string };
+      if (!response.ok || !payload.director) {
+        setDirectorFormMessage(payload.error ?? "Unable to save director details.");
+        return;
+      }
+
+      setDirectors((previous) => [payload.director as DirectorProfile, ...previous]);
+      setIsDirectorFormOpen(false);
+      setSelectedDirector(payload.director as DirectorProfile);
+      setDirectorForm(emptyDirectorForm);
+      setDirectorPhotoFileName("");
+      setDirectorFormErrors({});
+      setDirectorFormMessage("");
+    } catch {
+      setDirectorFormMessage("Unable to save director details right now. Please try again.");
+    } finally {
+      setDirectorSubmitting(false);
+    }
+  }
 
   const results = useMemo(() => searchMembers(memberRecords, query, searchMode), [
     memberRecords,
@@ -894,9 +1158,8 @@ export function CampaignSite({
 
   const activeCopy = copy[language];
   const hasResults = query.trim().length > 0;
+  const safeDirectors = Array.isArray(directors) ? directors : [];
   const phoneDigits = normalizePhone(candidate.whatsapp);
-  const venueDisplay = election.venue.replace("VEDIKA", "Vedika");
-  const mapsLink = "https://maps.app.goo.gl/WWcPhM7FrLipzLub9";
   const supportMessage = `I support Ch Kishore Kumar for JCCI Director 8.\n\nName: ${submissionName || ""}\nBusiness: ${submissionBusiness || ""}\nPhone: ${submissionPhone || ""}\nAddress: ${submissionAddress || ""}\nNotes: ${submissionNote || ""}`;
 
   const whatsappLink =
@@ -908,6 +1171,10 @@ export function CampaignSite({
     )}&body=${encodeURIComponent(supportMessage.trim())}`;
   const selectedSlotLabel =
     slotOptions.find((slot) => slot.key === selectedSlot)?.label ?? "";
+  const navItems = showWhoAmI ? activeCopy.nav : activeCopy.nav.filter((_, index) => index !== 1);
+  const navHrefs = showWhoAmI
+    ? ["#home", "#profile", "#slots", "#contact"]
+    : ["#home", "#slots", "#contact"];
 
   async function incrementSupport() {
     if (hasSupported || supportLoading) {
@@ -1056,11 +1323,12 @@ export function CampaignSite({
           </div>
         </div>
         <nav className={styles.nav} aria-label="Section navigation">
-          {activeCopy.nav.map((item, index) => (
-            <a key={item} href={["#home", "#profile", "#slots", "#contact"][index]}>
+          {navItems.map((item, index) => (
+            <a key={item} href={navHrefs[index]}>
               {item}
             </a>
           ))}
+          <a href="#directors">JCCI Directors 2026-27</a>
         </nav>
         <div className={styles.languageSwitcher} aria-label="Language selector">
           {languageOptions.map((option) => (
@@ -1079,43 +1347,15 @@ export function CampaignSite({
       <main>
         <section className={styles.hero} id="home">
           <div className={styles.heroContent}>
-            <div className={styles.voteHighlight}>{activeCopy.heroTitle}</div>
+            <div className={styles.voteHighlight}>Thank you from</div>
             <h1>{candidate.name}</h1>
-            <p className={styles.heroLead}>{activeCopy.heroLead}</p>
-            <div className={styles.heroStats}>
-              <div>
-                <span className={styles.heroStatLabel}>{activeCopy.heroDate}</span>
-                <strong className={styles.heroStatHighlight}>{election.date}</strong>
-              </div>
-              <div>
-                <span className={styles.heroStatLabel}>{activeCopy.heroTime}</span>
-                <strong className={styles.heroStatHighlight}>{election.time}</strong>
-              </div>
-              <div>
-                <span className={styles.heroStatLabel}>{activeCopy.heroVenue}</span>
-                <strong className={styles.heroStatHighlight}>Vedika</strong>
-                <span>{venueDisplay}</span>
-                <a
-                  className={styles.mapsButton}
-                  href={mapsLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Open directions in Google Maps"
-                  title={activeCopy.directionsTitle}
-                >
-                  <BiNavigation aria-hidden="true" className={styles.directionIcon} />
-                </a>
-              </div>
-              <div className={styles.heroBallotTile}>
-                <span className={styles.heroStatLabel}>{activeCopy.heroBallot}</span>
-                <strong className={`${styles.ballotNumberBig} ${styles.heroBallotCard}`}>8</strong>
-              </div>
-            </div>
-            <div className={styles.heroActions}>
-              <a className={styles.primaryAction} href="#eligibility">
-                {activeCopy.primary}
-              </a>
-            </div>
+            <p className={styles.heroLead}>
+              for electing as the director at <span className={styles.heroMetric}>13th rank</span> with{" "}
+              <span className={styles.heroMetric}>462 votes</span>.
+            </p>
+            <p className={styles.heroTransitionNote}>
+              This website will soon be fully transitioned into the official JCCI website.
+            </p>
           </div>
 
           <div className={styles.heroVisual}>
@@ -1129,49 +1369,131 @@ export function CampaignSite({
                 sizes="(max-width: 900px) 100vw, 560px"
               />
             </div>
-            <div className={styles.heroEmblems}>
-              <Image src="/assets/airforce-logo.png" alt="Indian Air Force logo" width={104} height={104} />
-              <Image src="/assets/jcci-logo.png" alt="JCCI logo" width={104} height={104} />
-              <Image src="/assets/jcma-logo.png" alt="JCMA logo" width={104} height={104} />
-            </div>
           </div>
         </section>
 
-        <section className={styles.section} id="profile">
-          <div className={styles.sectionHeader}>
-            <p className={styles.sectionKicker}>{activeCopy.profileKicker}</p>
-            <h2>{activeCopy.profileTitle}</h2>
+        {showWhoAmI ? (
+          <section className={styles.section} id="profile">
+            <div className={styles.sectionHeader}>
+              <p className={styles.sectionKicker}>{activeCopy.profileKicker}</p>
+              <h2>{activeCopy.profileTitle}</h2>
+            </div>
+
+            <div className={styles.profileGrid}>
+              <article className={styles.profilePanel}>
+                <p className={styles.cardLabel}>{activeCopy.aboutLabel}</p>
+                <h3>{activeCopy.aboutHeading}</h3>
+                <p>{candidate.background}</p>
+              </article>
+
+              <article className={styles.profilePanel}>
+                <p className={styles.cardLabel}>{activeCopy.backgroundLabel}</p>
+                <h3>{activeCopy.backgroundHeading}</h3>
+                <p>{activeCopy.backgroundText}</p>
+                <div className={styles.tagList}>
+                  {candidate.traits.map((trait) => (
+                    <span key={trait}>{trait}</span>
+                  ))}
+                </div>
+              </article>
+
+              <article className={styles.profilePanel}>
+                <p className={styles.cardLabel}>{activeCopy.expertiseLabel}</p>
+                <h3>{activeCopy.expertiseHeading}</h3>
+                <p>{activeCopy.expertiseText}</p>
+                <div className={styles.tagList}>
+                  {candidate.expertise.map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
+                </div>
+              </article>
+            </div>
+          </section>
+        ) : null}
+
+        <section className={styles.section} id="directors">
+          <div className={styles.directorHeaderRow}>
+            <div className={styles.sectionHeader}>
+              <p className={styles.sectionKicker}>JCCI Core Team</p>
+              <h2>JCCI Directors 2026-27</h2>
+            </div>
+
+            <div className={styles.directorSectionActions}>
+            <button
+              type="button"
+              className={styles.primaryAction}
+              onClick={() => {
+                setDirectorForm(emptyDirectorForm);
+                setDirectorPhotoFileName("");
+                setDirectorFormErrors({});
+                setDirectorFormMessage("");
+                setIsDirectorFormOpen(true);
+              }}
+            >
+              Add your details
+            </button>
+            </div>
           </div>
 
-          <div className={styles.profileGrid}>
-            <article className={styles.profilePanel}>
-              <p className={styles.cardLabel}>{activeCopy.aboutLabel}</p>
-              <h3>{activeCopy.aboutHeading}</h3>
-              <p>{candidate.background}</p>
+          {safeDirectors.length ? (
+            <div className={styles.directorGrid}>
+              {safeDirectors.map((director) => (
+                <article
+                  key={director.id}
+                  className={styles.directorCard}
+                  onClick={() => setSelectedDirector(director)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setSelectedDirector(director);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className={styles.directorPhotoWrap}>
+                    <img src={director.photoUrl} alt={director.name} className={styles.directorPhoto} />
+                  </div>
+                  <h3>{director.name}</h3>
+                  <p className={styles.directorBusiness}>{director.businessName}</p>
+                  <div className={styles.directorQuickActions}>
+                    <a
+                      href={`tel:${normalizePhone(director.contactNumber)}`}
+                      className={styles.directorIconButton}
+                      aria-label={`Call ${director.name}`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <BiPhoneCall aria-hidden="true" />
+                    </a>
+                    <a
+                      href={`https://wa.me/${normalizePhone(director.whatsappNumber)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={styles.directorIconButton}
+                      aria-label={`WhatsApp ${director.name}`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <FaWhatsapp aria-hidden="true" />
+                    </a>
+                    <a
+                      href={`mailto:${director.email}`}
+                      className={styles.directorIconButton}
+                      aria-label={`Email ${director.name}`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <BiEnvelope aria-hidden="true" />
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <article className={styles.infoCard}>
+              <p className={styles.cardLabel}>No entries yet</p>
+              <h3>Be the first to add Director details</h3>
+              <p>Tap "Add your details" and submit all required information.</p>
             </article>
-
-            <article className={styles.profilePanel}>
-              <p className={styles.cardLabel}>{activeCopy.backgroundLabel}</p>
-              <h3>{activeCopy.backgroundHeading}</h3>
-              <p>{activeCopy.backgroundText}</p>
-              <div className={styles.tagList}>
-                {candidate.traits.map((trait) => (
-                  <span key={trait}>{trait}</span>
-                ))}
-              </div>
-            </article>
-
-            <article className={styles.profilePanel}>
-              <p className={styles.cardLabel}>{activeCopy.expertiseLabel}</p>
-              <h3>{activeCopy.expertiseHeading}</h3>
-              <p>{activeCopy.expertiseText}</p>
-              <div className={styles.tagList}>
-                {candidate.expertise.map((item) => (
-                  <span key={item}>{item}</span>
-                ))}
-              </div>
-            </article>
-          </div>
+          )}
         </section>
 
         {showBusinessNetwork ? (
@@ -1449,6 +1771,259 @@ export function CampaignSite({
                   <h3>{activeCopy.sideNoteTitle}</h3>
                   <p>{activeCopy.sideNoteText}</p>
                 </aside>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {isDirectorFormOpen ? (
+          <div
+            className={styles.modalBackdrop}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Add director details"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) {
+                setIsDirectorFormOpen(false);
+              }
+            }}
+          >
+            <div className={styles.modalCard}>
+              <div className={styles.modalHeader}>
+                <div>
+                  <p className={styles.sectionKicker}>JCCI Directors 2026-27</p>
+                  <h3>Add your details</h3>
+                </div>
+                <button
+                  type="button"
+                  className={styles.modalCloseButton}
+                  onClick={() => setIsDirectorFormOpen(false)}
+                >
+                  {activeCopy.close}
+                </button>
+              </div>
+
+              <form className={styles.directorForm} onSubmit={submitDirectorProfile}>
+                <div className={styles.directorFormIntro}>
+                  <span className={styles.directorFormBadge}>Required profile</span>
+                  <p>Use text for names, alphanumeric text for addresses and experience, and Indian +91 phone numbers only.</p>
+                </div>
+
+                <div className={styles.directorFormGrid}>
+                  <label className={styles.directorField}>
+                    <span>Name</span>
+                    <input
+                      type="text"
+                      inputMode="text"
+                      autoComplete="name"
+                      autoCapitalize="words"
+                      value={directorForm.name}
+                      onChange={(event) => updateDirectorField("name", sanitizeTextOnly(event.target.value))}
+                      onBlur={(event) => updateDirectorField("name", titleCaseWords(sanitizeTextOnly(event.target.value)))}
+                      placeholder="Full name"
+                    />
+                    {directorFormErrors.name ? <small className={styles.directorError}>{directorFormErrors.name}</small> : null}
+                  </label>
+
+                  <label className={styles.directorField}>
+                    <span>Business Name</span>
+                    <input
+                      type="text"
+                      inputMode="text"
+                      autoComplete="organization"
+                      autoCapitalize="words"
+                      value={directorForm.businessName}
+                      onChange={(event) => updateDirectorField("businessName", sanitizeTextOnly(event.target.value))}
+                      onBlur={(event) => updateDirectorField("businessName", titleCaseWords(sanitizeTextOnly(event.target.value)))}
+                      placeholder="Business or firm name"
+                    />
+                    {directorFormErrors.businessName ? <small className={styles.directorError}>{directorFormErrors.businessName}</small> : null}
+                  </label>
+
+                  <label className={styles.directorField}>
+                    <span>Business Address</span>
+                    <textarea
+                      rows={2}
+                      value={directorForm.businessAddress}
+                      onChange={(event) => updateDirectorField("businessAddress", sanitizeAlphaNumeric(event.target.value))}
+                      placeholder="Business location, market, road, town"
+                    />
+                    {directorFormErrors.businessAddress ? <small className={styles.directorError}>{directorFormErrors.businessAddress}</small> : null}
+                  </label>
+
+                  <label className={styles.directorField}>
+                    <span>Residence / Address</span>
+                    <textarea
+                      rows={2}
+                      value={directorForm.residenceAddress}
+                      onChange={(event) => updateDirectorField("residenceAddress", sanitizeAlphaNumeric(event.target.value))}
+                      placeholder="Residence or communication address"
+                    />
+                    {directorFormErrors.residenceAddress ? <small className={styles.directorError}>{directorFormErrors.residenceAddress}</small> : null}
+                  </label>
+
+                  <label className={styles.directorField}>
+                    <span>Contact Number</span>
+                    <div className={styles.directorPhoneInput}>
+                      <span className={styles.directorPhonePrefix} aria-hidden="true">🇮🇳 +91</span>
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={10}
+                        value={directorForm.contactNumber}
+                        onChange={(event) => updateDirectorField("contactNumber", sanitizePhoneDigits(event.target.value))}
+                        placeholder="10 digit number"
+                      />
+                    </div>
+                    {directorFormErrors.contactNumber ? <small className={styles.directorError}>{directorFormErrors.contactNumber}</small> : null}
+                  </label>
+
+                  <label className={styles.directorField}>
+                    <span>WhatsApp Number</span>
+                    <div className={styles.directorPhoneInput}>
+                      <span className={styles.directorPhonePrefix} aria-hidden="true">🇮🇳 +91</span>
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={10}
+                        value={directorForm.whatsappNumber}
+                        onChange={(event) => updateDirectorField("whatsappNumber", sanitizePhoneDigits(event.target.value))}
+                        placeholder="10 digit number"
+                      />
+                    </div>
+                    {directorFormErrors.whatsappNumber ? <small className={styles.directorError}>{directorFormErrors.whatsappNumber}</small> : null}
+                  </label>
+
+                  <label className={styles.directorField}>
+                    <span>Email</span>
+                    <input
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      value={directorForm.email}
+                      onChange={(event) => updateDirectorField("email", event.target.value)}
+                      placeholder="name@example.com"
+                    />
+                    {directorFormErrors.email ? <small className={styles.directorError}>{directorFormErrors.email}</small> : null}
+                  </label>
+
+                  <label className={styles.directorField}>
+                    <span>Experience & Expertise</span>
+                    <textarea
+                      rows={3}
+                      value={directorForm.experienceExpertise}
+                      onChange={(event) => updateDirectorField("experienceExpertise", sanitizeAlphaNumeric(event.target.value))}
+                      placeholder="Business experience, industry skills, chamber contribution"
+                    />
+                    {directorFormErrors.experienceExpertise ? <small className={styles.directorError}>{directorFormErrors.experienceExpertise}</small> : null}
+                  </label>
+
+                  <label className={styles.directorField}>
+                    <span>Photo to upload</span>
+                    <div className={styles.directorFileInputWrap}>
+                      <input
+                        id="director-photo-upload"
+                        className={styles.directorFileInput}
+                        type="file"
+                        accept="image/*,.heic,.heif,.jpg,.jpeg,.png"
+                        onChange={onDirectorPhotoChange}
+                      />
+                      <label htmlFor="director-photo-upload" className={styles.directorFileInputLabel}>
+                        <span className={styles.directorFileIcon}>
+                          <BiCloudUpload aria-hidden="true" />
+                        </span>
+                        <span className={styles.directorFileTitle}>Choose a file or drag & drop</span>
+                        <span className={styles.directorFileHint}>Max 20MB</span>
+                        <span className={styles.directorFileButton}>Browse file</span>
+                      </label>
+                    </div>
+                    {directorPhotoFileName ? <small className={styles.directorHelper}>Selected: {directorPhotoFileName}</small> : null}
+                    <small className={styles.directorHelper}>Supported: jpg, jpeg, png, heic and other image formats.</small>
+                    {directorForm.photoUrl ? (
+                      <img src={directorForm.photoUrl} alt="Director preview" className={styles.directorPreviewImage} />
+                    ) : null}
+                    {directorFormErrors.photoUrl ? <small className={styles.directorError}>{directorFormErrors.photoUrl}</small> : null}
+                  </label>
+                </div>
+
+                {directorFormMessage ? <p className={styles.directorErrorBanner}>{directorFormMessage}</p> : null}
+
+                <div className={styles.formActions}>
+                  <button type="submit" className={styles.primaryAction} disabled={directorSubmitting}>
+                    {directorSubmitting ? "Submitting..." : "Submit details"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : null}
+
+        {selectedDirector ? (
+          <div
+            className={styles.modalBackdrop}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Director details"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) {
+                setSelectedDirector(null);
+              }
+            }}
+          >
+            <div className={styles.modalCard}>
+              <div className={styles.modalHeader}>
+                <div>
+                  <p className={styles.sectionKicker}>Director Profile</p>
+                  <h3>{selectedDirector.name}</h3>
+                </div>
+                <button
+                  type="button"
+                  className={styles.modalCloseButton}
+                  onClick={() => setSelectedDirector(null)}
+                >
+                  {activeCopy.close}
+                </button>
+              </div>
+
+              <div className={styles.directorDetailLayout}>
+                <img src={selectedDirector.photoUrl} alt={selectedDirector.name} className={styles.directorDetailPhoto} />
+                <div className={styles.directorDetailBody}>
+                  <p><strong>Name:</strong> {selectedDirector.name}</p>
+                  <p><strong>Business Name:</strong> {selectedDirector.businessName}</p>
+                  <p><strong>Business Address:</strong> {selectedDirector.businessAddress}</p>
+                  <p><strong>Residence / Address:</strong> {selectedDirector.residenceAddress}</p>
+                  <p><strong>Contact:</strong> {selectedDirector.contactNumber}</p>
+                  <p><strong>WhatsApp Number:</strong> {selectedDirector.whatsappNumber}</p>
+                  <p><strong>Email:</strong> {selectedDirector.email}</p>
+                  <p><strong>Experience & Expertise:</strong> {selectedDirector.experienceExpertise}</p>
+                  <div className={styles.directorQuickActions}>
+                    <a
+                      href={`tel:${normalizePhone(selectedDirector.contactNumber)}`}
+                      className={styles.directorIconButton}
+                      aria-label={`Call ${selectedDirector.name}`}
+                    >
+                      <BiPhoneCall aria-hidden="true" />
+                    </a>
+                    <a
+                      href={`https://wa.me/${normalizePhone(selectedDirector.whatsappNumber)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={styles.directorIconButton}
+                      aria-label={`WhatsApp ${selectedDirector.name}`}
+                    >
+                      <FaWhatsapp aria-hidden="true" />
+                    </a>
+                    <a
+                      href={`mailto:${selectedDirector.email}`}
+                      className={styles.directorIconButton}
+                      aria-label={`Email ${selectedDirector.name}`}
+                    >
+                      <BiEnvelope aria-hidden="true" />
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

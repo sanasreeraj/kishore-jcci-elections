@@ -25,6 +25,23 @@ create table if not exists public.slot_counts (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.jcci_directors (
+  id uuid primary key default gen_random_uuid(),
+  full_name text not null,
+  business_name text not null,
+  business_address text not null,
+  residence_address text not null,
+  photo_url text not null,
+  contact_number text not null,
+  whatsapp_number text not null,
+  email text not null,
+  experience_expertise text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists jcci_directors_created_at_idx on public.jcci_directors (created_at desc);
+
 create or replace function public.increment_support_counter()
 returns bigint
 language plpgsql
