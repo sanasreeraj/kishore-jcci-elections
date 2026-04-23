@@ -83,7 +83,7 @@ const eligibleDirectorNames = [
   "K Dillip Reddy",
   "Dinesh Sunkari",
   "K Rama Krishna",
-  "Satish Kumar Patro (Nilui)",
+  "Satish Kumar Patro (Nilu)",
   "A Srinivasa Rao (Arugula)",
   "V Prabhakar",
   "D Madhav",

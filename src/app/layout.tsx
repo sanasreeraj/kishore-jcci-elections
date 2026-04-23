@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import { PlatformShell } from "@/components/platform-shell";
 import "./globals.css";
 
 const bodyFont = IBM_Plex_Sans({
@@ -15,9 +16,8 @@ const displayFont = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Ch Kishore Kumar | JCCI Director Campaign",
-  description:
-    "Ch Kishore Kumar, Ballot - 8, Director candidate for JCCI Election 2026-27.",
+  title: "JCCI Digital Platform",
+  description: "Official digital platform for Jeypore Chamber of Commerce & Industry.",
   icons: {
     icon: "/assets/jcci-logo.png",
   },
@@ -30,7 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${bodyFont.variable} ${displayFont.variable}`}>
-      <body>{children}</body>
+      <body>
+        <PlatformShell>{children}</PlatformShell>
+      </body>
     </html>
   );
 }

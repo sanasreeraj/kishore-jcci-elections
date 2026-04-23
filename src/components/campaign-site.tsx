@@ -590,7 +590,7 @@ const electionResultsTop21: ElectionResultRow[] = [
   { ballotNo: 17, name: "K Dillip Reddy", votes: 583 },
   { ballotNo: 12, name: "Dinesh Sunkari", votes: 576 },
   { ballotNo: 18, name: "K Rama Krishna", votes: 557 },
-  { ballotNo: 31, name: "Satish Kumar Patro (Nilui)", votes: 555 },
+  { ballotNo: 31, name: "Satish Kumar Patro (Nilu)", votes: 555 },
   { ballotNo: 1, name: "A Srinivasa Rao (Arugula)", votes: 551 },
   { ballotNo: 35, name: "V Prabhakar", votes: 516 },
   { ballotNo: 11, name: "D Madhav", votes: 494 },
